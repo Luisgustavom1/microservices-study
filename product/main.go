@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 
@@ -26,6 +27,7 @@ func main() {
 	r.Get("/products", getProducts)
 	r.Get("/products/{id}", getProductsById)
 
+	log.Println("Start serve :4040")
 	http.ListenAndServe(fmt.Sprintf(":%s", "4040"), r)
 }
 

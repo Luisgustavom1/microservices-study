@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finalizar compra</title>
+</head>
+<body>
+  <h1>Finalizar compra</h1>
+
+  <h2>Produto: {{.Product}}</h2>
+  <h3>Total: R$ {{.Price}}</h3>
+
+  <form action="/finish" method="post">
+    <input type="hidden" name="productId" value="{{.Uuid}}">
+    <label for="name">
+      Name: <input type="name" name="name">
+    </label>
+    <label for="email">
+      Email: <input type="email" name="email">
+    </label>
+    <label for="phone">
+      Phone: <input type="phone" name="phone">
+    </label>
+
+    <button type="submit">Finalizar compra</button>
+  </form>
+</body>
+</html>

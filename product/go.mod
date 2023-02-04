@@ -1,4 +1,4 @@
-module main
+module product
 
 go 1.19
 

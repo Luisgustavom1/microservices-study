@@ -50,7 +50,6 @@ func finish(w http.ResponseWriter, r *http.Request) {
 	order.ProductId = r.FormValue("productId")
 
 	data, _ := json.Marshal(order)
-	fmt.Println(string(data))
 
 	connection := queue.Connect()
 	queue.Notify(data, "checkout", "", connection)

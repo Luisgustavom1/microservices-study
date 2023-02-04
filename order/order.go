@@ -1,10 +1,15 @@
 package main
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
+	"log"
+	"order/db"
 	"order/queue"
-	"os"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Product struct {
@@ -30,6 +35,27 @@ func main() {
 	queue.StartConsuming(connection, messagesChannel)
 
 	for message := range messagesChannel {
+		createOrder(message)
 		fmt.Println(string(message))
+	}
+}
+
+func createOrder(payload []byte) {
+	var order Order
+	json.Unmarshal(payload, &order)
+
+	order.Uuid = uuid.NewString()
+	order.Status = "pendente"
+	order.CreatedAt = time.Now()
+	saveOrder(order)
+}
+
+func saveOrder(order Order) {
+	orderJson, _ := json.Marshal(order)
+	connection := db.Connect()
+
+	err := connection.Set(context.TODO(), order.Uuid, string(orderJson), 0).Err()
+	if err != nil {
+		panic(err.Error())
 	}
 }

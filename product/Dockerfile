@@ -6,4 +6,4 @@ COPY . .
 
 RUN GOOS=linux go build -ldflags="-s -w"
 
-CMD ["./main"]
+CMD ["./product"]

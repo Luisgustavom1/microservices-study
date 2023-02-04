@@ -28,7 +28,7 @@ func main() {
 	r.Get("/products/{id}", getProductsById)
 
 	log.Println("Start serve :4040")
-	http.ListenAndServe(fmt.Sprintf(":%s", "4040"), r)
+	http.ListenAndServe(":4040", r)
 }
 
 func getProducts(w http.ResponseWriter, request *http.Request) {

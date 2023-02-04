@@ -35,7 +35,7 @@ func main() {
 	r.Get("/product/{id}", showProduct)
 
 	log.Println("Start serve :4041")
-	http.ListenAndServe(fmt.Sprintf(":%s", "4041"), r)
+	http.ListenAndServe(":4041", r)
 }
 
 func listProducts(w http.ResponseWriter, request *http.Request) {

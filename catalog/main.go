@@ -34,7 +34,7 @@ func main() {
 	r.Get("/", listProducts)
 	r.Get("/product/{id}", showProduct)
 
-	log.Println("Start serve :4041")
+	log.Println("Start server :4041")
 	http.ListenAndServe(":4041", r)
 }
 

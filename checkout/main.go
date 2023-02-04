@@ -1,10 +1,12 @@
 package main
 
 import (
+	"checkout/queue"
 	"encoding/json"
 	"fmt"
 	"html/template"
 	"io"
+	"log"
 	"net/http"
 	"os"
 
@@ -36,6 +38,7 @@ func main() {
 	r.HandleFunc("/finish", finish)
 	r.HandleFunc("/{id}", makeCheckout)
 
+	log.Println("Start server :4042")
 	http.ListenAndServe(":4042", r)
 }
 
@@ -49,10 +52,13 @@ func finish(w http.ResponseWriter, r *http.Request) {
 	data, _ := json.Marshal(order)
 	fmt.Println(string(data))
 
+	connection := queue.Connect()
+	queue.Notify(data, "checkout", "", connection)
+
 	w.Write([]byte("Processed Checkout"))
 }
 
-func makeCheckout(w http.ResponseWriter, r *http.Request) {
+func makeCheckout(w http.ResponseWriter, r *http.Request) { 
 	productId := chi.URLParam(r, "id")
 	product := loadProductById(productId)
 	t := template.Must(template.ParseFiles("templates/checkout.html"))

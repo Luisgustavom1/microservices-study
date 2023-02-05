@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"order/db"
 	"order/queue"
+	"os"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/streadway/amqp"
 )
 
 type Product struct {
@@ -32,15 +33,16 @@ func main() {
 	messagesChannel := make(chan []byte)
 
 	connection := queue.Connect()
-	queue.StartConsuming(connection, messagesChannel)
+	queue.StartConsuming(os.Getenv("RABBITMQ_CONSUMER_QUEUE"), connection, messagesChannel)
 
 	for message := range messagesChannel {
-		createOrder(message)
+		order := createOrder(message)
+		notifyCreatedOrder(order, connection)
 		fmt.Println(string(message))
 	}
 }
 
-func createOrder(payload []byte) {
+func createOrder(payload []byte) Order {
 	var order Order
 	json.Unmarshal(payload, &order)
 
@@ -48,6 +50,7 @@ func createOrder(payload []byte) {
 	order.Status = "pendente"
 	order.CreatedAt = time.Now()
 	saveOrder(order)
+	return order
 }
 
 func saveOrder(order Order) {
@@ -58,4 +61,13 @@ func saveOrder(order Order) {
 	if err != nil {
 		panic(err.Error())
 	}
+}
+
+func notifyCreatedOrder(order Order, channel *amqp.Channel) {
+	orderJson, err := json.Marshal(order)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	queue.Notify(orderJson, "order", "", channel)
 }

@@ -1,6 +1,7 @@
 package queue
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/streadway/amqp"
@@ -22,9 +23,9 @@ func Connect() *amqp.Channel {
 	return channel
 }
 
-func StartConsuming(channel *amqp.Channel, messageCh chan []byte) {
+func StartConsuming(queueName string, channel *amqp.Channel, messageCh chan []byte) {
 	queue, err := channel.QueueDeclare(
-		os.Getenv("RABBITMQ_CONSUMER_QUEUE"),
+		queueName,
 		true,
 		false,
 		false,
@@ -38,7 +39,7 @@ func StartConsuming(channel *amqp.Channel, messageCh chan []byte) {
 
 	messages, err := channel.Consume(
 		queue.Name,
-		os.Getenv("RABBITMQ_CONSUMER_QUEUE"),
+		queueName,
 		true,
 		false,
 		false,
@@ -55,4 +56,22 @@ func StartConsuming(channel *amqp.Channel, messageCh chan []byte) {
 		}
 		close(messageCh)
 	}()
+}
+
+func Notify(payload []byte, exchange string, routingKey string, channel *amqp.Channel) {
+	err := channel.Publish(
+		exchange,
+		routingKey,
+		false,
+		false,
+		amqp.Publishing{
+			ContentType: "application/json",
+			Body:        []byte(payload),
+		})
+
+	if err != nil {
+		panic(err.Error())
+	}
+
+	fmt.Println("Message sent")
 }

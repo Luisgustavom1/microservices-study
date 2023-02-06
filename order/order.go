@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"order/db"
 	"order/queue"
-	"os"
 	"time"
 
 	"github.com/google/uuid"
@@ -30,16 +30,33 @@ type Order struct {
 }
 
 func main() {
+	var param string
+	flag.StringVar(&param, "opt", "", "Usage")
+	flag.Parse()
+
 	messagesChannel := make(chan []byte)
-
 	connection := queue.Connect()
-	queue.StartConsuming(os.Getenv("RABBITMQ_CONSUMER_QUEUE"), connection, messagesChannel)
 
-	for message := range messagesChannel {
-		order := createOrder(message)
-		notifyCreatedOrder(order, connection)
-		fmt.Println(string(message))
+	switch param {
+	case "checkout":
+		queue.StartConsuming("checkout", connection, messagesChannel)
+
+		for message := range messagesChannel {
+			order := createOrder(message)
+			notifyCreatedOrder(order, connection)
+			fmt.Println("Send order: ", order)
+		}
+	case "payment":
+		queue.StartConsuming("payment", connection, messagesChannel)
+
+		var order Order
+		for message := range messagesChannel {
+			json.Unmarshal(message, &order)
+			saveOrder(order)
+			fmt.Println("Receive processed order: ", order)
+		}
 	}
+
 }
 
 func createOrder(payload []byte) Order {

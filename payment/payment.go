@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"payment/queue"
 	"time"
 
@@ -29,6 +30,7 @@ func main() {
 		json.Unmarshal(payload, &order)
 		order.Status = "aprovado"
 		notifyPaymentProcessed(order, connection)
+		fmt.Println("Payment send processed order: ", order)
 	}
 }
 

@@ -1,4 +1,3 @@
-# microservices-study
 A simple project to study and understand more about microservices
 
 Techs:

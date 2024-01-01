@@ -1,15 +1,20 @@
 {
 	"scripts": {
-		"build": "tsc -p tsconfig.json",
+		"dev": "nodemon --watch src src/index.ts",
 		"start": "node index.js",
-		"dev": "nodemon --watch src src/index.ts"
+		"build": "tsc -p tsconfig.json",
+		"db:migrate": "ts-node --files ./src/db/migrate.ts",
+		"db:generate": "drizzle-kit generate:mysql"
 	},
 	"dependencies": {
-		"fastify": "^4.25.2"
+		"drizzle-orm": "^0.29.2",
+		"fastify": "^4.25.2",
+		"mysql2": "^3.6.5"
 	},
 	"devDependencies": {
 		"@tsconfig/node21": "^21.0.1",
 		"@types/node": "^20.10.6",
+		"drizzle-kit": "^0.20.9",
 		"nodemon": "^3.0.2",
 		"ts-node": "^10.9.2",
 		"typescript": "^5.3.3"

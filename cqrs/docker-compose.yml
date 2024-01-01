@@ -10,10 +10,12 @@ services:
       MYSQL_USER: 'moneta_flow'
       MYSQL_PASSWORD: 'Bk55yc1u0eiqga6e'
       MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
-      MYSQL_ROOT_HOST: '%'
     volumes:
-      - ./database:/docker-entrypoint-initdb.d
+      - database:/var/lib/mysql
     expose:
       - 3306
     ports:
       - 3306:3306
+
+volumes:
+  database:

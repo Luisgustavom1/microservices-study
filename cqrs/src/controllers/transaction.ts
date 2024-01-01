@@ -1,13 +1,13 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { DepositDomain } from "../domain/deposit";
+import { TransactionDomain } from "../domain/deposit";
 
-export class DepositController {;
-  private static readonly depositDomain = new DepositDomain();
+export class TransactionController {;
+  private static readonly transactionDomain = new TransactionDomain();
 
   public static async deposit(req: FastifyRequest<{ Body: DepositDTO;}>, reply: FastifyReply) {
     const body = req.body;
     const depositInput = new DepositDTO(body.amount, body.currency, body.wallet);
-    const output = await this.depositDomain.deposit(depositInput);
+    const output = await this.transactionDomain.deposit(depositInput);
 
     if (!output.success) {
       reply.code(400);
@@ -20,7 +20,18 @@ export class DepositController {;
 
   public static withdraw() {}
 
-  public static list() {}
+  public static async list(req: FastifyRequest<{ Params: { wallet: string } }>, reply: FastifyReply) {
+    const wallet = req.params.wallet;
+    const output = await this.transactionDomain.list(wallet);
+
+    if (!output.success) {
+      reply.code(400);
+      return output;
+    }
+
+    reply.code(200);
+    return output;
+  }
 }
 
 export class DepositDTO {

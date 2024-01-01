@@ -1,9 +1,9 @@
 import fastify from 'fastify'
-import { DepositController, DepositInputDTO } from "./controllers/deposit";
+import { DepositController, DepositDTO } from "./controllers/deposit";
 
 const server = fastify()
 
-server.post<{ Body: DepositInputDTO }>('/deposit', async (request) => {
+server.post<{ Body: DepositDTO }>('/deposit', async (request) => {
   return DepositController.deposit(request);
 })
 

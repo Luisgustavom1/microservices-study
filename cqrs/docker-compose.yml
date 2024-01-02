@@ -3,7 +3,7 @@ version: '3.1'
 services:
   db:
     image: mysql
-    container_name: moneta-flow-mysql
+    container_name: moneta-flow-db
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: 'moneta_flow'
@@ -19,6 +19,7 @@ services:
 
   read-db:
     image: mongo
+    container_name: moneta-flow-read-db
     restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: "moneta_flow"
@@ -28,6 +29,23 @@ services:
     ports:
       - 27017:27017
     
+  event-bus:
+    image: rabbitmq:3.8-management
+    container_name: moneta-flow-event-bus
+    environment:
+      RABBITMQ_DEFAULT_USER: "moneta_flow"
+      RABBITMQ_DEFAULT_PASS: "Bk55yc1u0eiqga6e"
+    volumes:
+      - event-bus:/var/lib/rabbitmq
+    expose:
+      - 5672
+      - 15672
+    ports:
+      - 5672:5672
+      - 15672:15672
+
 volumes:
   database:
   database-read:
+  event-bus:
+

@@ -7,7 +7,7 @@ graph TD
     User --> |Commands - POST| App --> |Publish command event| Queue
     
     Queue --> |Listen| CommandHandler --> |Persist Data| WriteDb
-    CommandHandler --> |Finish Command| Queue
+    CommandHandler --> |Sent Finish Command| Queue
 
     Queue --> |Listen| QueryHandler --> |Update data| ReadDb
 

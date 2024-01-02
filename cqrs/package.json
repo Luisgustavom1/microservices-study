@@ -2,6 +2,7 @@
 	"scripts": {
 		"dev": "nodemon --watch src src/index.ts",
 		"dev:event-handler": "nodemon --watch src src/event.handler.ts",
+		"dev:command-handler": "nodemon --watch src src/command.handler.ts",
 		"start": "node index.js",
 		"build": "tsc -p tsconfig.json",
 		"db:migrate": "ts-node --files ./src/db/migrate.ts",

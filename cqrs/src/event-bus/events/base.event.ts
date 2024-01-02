@@ -1,8 +1,8 @@
 import amqplib from 'amqplib';
 import { EventBusConnection } from '../connection';
-import { Query } from '../../services/Query';
+import { Listener } from '../../listeners/listener';
 
-export abstract class BaseEvent {
+export abstract class BaseEvent<T = unknown> {
   constructor(
     protected queue: string,
   ) {}
@@ -12,9 +12,11 @@ export abstract class BaseEvent {
     options?: amqplib.Options.Publish
   ): Promise<void>;
 
-  public abstract subscribe(queryService: Query): Promise<void>;
+  public abstract subscribe(queryService: Listener): Promise<void>;
 
   protected connection() {
     return EventBusConnection.connection;
   }
+
+  public abstract prepareMessage(message: T): unknown;
 }

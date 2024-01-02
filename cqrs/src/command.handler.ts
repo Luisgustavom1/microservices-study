@@ -1,8 +1,9 @@
 import { connectToReadDB } from "./db-read";
 import { EventBusConnection } from "./event-bus/connection";
+import { DepositEvent } from "./event-bus/events/deposit.event";
 import { TransactionEvent } from "./event-bus/events/transaction.event";
-import { QueryListener } from "./listeners/transaction/query.listener";
-import { TransactionQuery } from "./services/transaction/query";
+import { CommandListener } from "./listeners/transaction/command.listener";
+import { TransactionCommand } from "./services/transaction/command";
 
 async function init() {
   await connectToReadDB();
@@ -14,9 +15,10 @@ async function init() {
     password: process.env.EVENT_BUS_PASSWORD,
   })
 
-  const eventToListen = new TransactionEvent()
-  const queryService = new TransactionQuery();
-  const listener = new QueryListener(queryService);
+  const eventToListen = new DepositEvent()
+  const newEvent = new TransactionEvent();
+  const commandService = new TransactionCommand();
+  const listener = new CommandListener(commandService, newEvent);
 
   eventToListen.subscribe(listener)
 }

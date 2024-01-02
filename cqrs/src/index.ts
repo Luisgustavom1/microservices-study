@@ -22,7 +22,7 @@ async function init() {
     username: process.env.EVENT_BUS_USERNAME,
     password: process.env.EVENT_BUS_PASSWORD,
   })
-  
+
   server.listen({ port: 8080 }, (err, address) => {
     if (err) {
       console.error(err)

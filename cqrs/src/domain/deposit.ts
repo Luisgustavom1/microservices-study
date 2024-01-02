@@ -2,12 +2,16 @@ import { eq } from "drizzle-orm";
 import { DepositDTO } from "../controllers/transaction";
 import { db } from "../db";
 import { account } from "../db/schema/account";
-import { transaction } from "../db/schema/transaction";
-import { collections } from "../db-read";
 import { TransactionType } from "../db-read/collections/transaction";
+import { BaseEvent } from "../event-bus/events/base.event";
+import { TransactionEvent } from "../event-bus/events/transaction.event";
+import { TransactionCommand } from "../services/Transaction/Command";
+import { TransactionQuery } from "../services/Transaction/Query";
 
 export class TransactionDomain {
-  private readonly db = db;
+  private readonly eventBus: BaseEvent = new TransactionEvent();
+  private readonly command = new TransactionCommand();
+  private readonly query = new TransactionQuery();
 
   public async deposit(depositInput: DepositDTO) {
     try {
@@ -22,14 +26,14 @@ export class TransactionDomain {
         return { success: false, error: "Conta não encontrada" };
       }
 
-      const [transactionCreated] = await this.db.insert(transaction).values({
+      const [transactionCreated] = await this.command.save({
         accountId: accountToDeposit.id,
         currency: depositInput.currency,
         amount: String(depositInput.amount),
         type: "deposit",
       });
 
-      await collections.transaction?.insertOne({ 
+      this.eventBus.publish({ 
         type: TransactionType.deposit, 
         transactionId: transactionCreated.insertId,
         currency: depositInput.currency, 
@@ -41,7 +45,7 @@ export class TransactionDomain {
       // eventual consistency when using a message broker
       return { success: true, id: transactionCreated.insertId }
     } catch (error) {
-      console.log("deu erro", error);
+      console.log("[ERROR]", error);
       return { success: false, error: "Tente novamente mais tarde" };
     }
   }
@@ -50,8 +54,8 @@ export class TransactionDomain {
 
   public async list(wallet: string) {
     try {
-      const transactions = await collections.transaction?.find({ wallet }).sort({ createdAt: -1 }).limit(10).toArray();
-      
+      const transactions = await this.query.list(wallet);
+
       return { success: true, data: transactions }
     } catch (error) {
       console.log("deu erro", error);

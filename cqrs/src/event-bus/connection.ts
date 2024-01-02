@@ -8,17 +8,17 @@ type ConnectionOptions = {
 };
 
 export class EventBusConnection {
-  private static _conn?: amqplib.Connection;
+  private static _conn: amqplib.Connection;
 
   public constructor() {}
 
   static async connect(
     connectionData: ConnectionOptions = {}
   ): Promise<amqplib.Connection> {
-    if (!this._conn) {
+    if (!EventBusConnection._conn) {
       try {
-        const conn = await amqplib.connect(this.createConnectionUrl(connectionData));
-        this._conn = conn;
+        const conn = await amqplib.connect(EventBusConnection.createConnectionUrl(connectionData));
+        EventBusConnection._conn = conn;
 
         return conn;
       } catch (error) {
@@ -26,16 +26,15 @@ export class EventBusConnection {
       }
     }
 
-    return this._conn;
+    return EventBusConnection._conn;
   }
 
   public static disconnect() {
-    this._conn?.close();
-    this._conn = undefined;
+    EventBusConnection._conn?.close();
   }
 
   public static get connection() {
-    return this._conn;
+    return EventBusConnection._conn;
   }
 
   private static createConnectionUrl(options: amqplib.Options.Connect): string {

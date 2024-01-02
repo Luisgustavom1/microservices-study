@@ -1,7 +1,7 @@
 import { MongoClient, Db, Collection } from 'mongodb';
 import Transaction from './collections/transaction';
 
-export const collections: { transaction?: Collection } = {}
+export const collections: { transaction?: Collection<Transaction> } = {}
 
 export async function connectToReadDB() {
   const MONGO_USERNAME = process.env.READ_DATABASE_USERNAME;
@@ -14,7 +14,7 @@ export async function connectToReadDB() {
       
   const db: Db = client.db(process.env.READ_DATABASE_NAME);
  
-  const transactionCollection: Collection = db.collection(Transaction.name);
+  const transactionCollection: Collection<Transaction> = db.collection(Transaction.name);
 
   collections.transaction = transactionCollection;
      

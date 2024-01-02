@@ -15,7 +15,7 @@ graph TD
     QueryHandler(Query Handler)
     ReadDb[(Read Database)]
     WriteDb[(Write Database)]
-    Queue["Events Queue"]
+    Queue["Event Bus"]
 ```
 
 ### References

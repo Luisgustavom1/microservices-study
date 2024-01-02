@@ -1,5 +1,6 @@
 import fastify from 'fastify'
 import { TransactionController, DepositDTO } from "./controllers/transaction";
+import { connectToReadDB } from './db-read';
 
 const server = fastify()
 
@@ -11,10 +12,12 @@ server.get<{ Params: { wallet: string } }>('/transaction/:wallet', async (reques
   return TransactionController.list(request, reply);
 })
 
-server.listen({ port: 8080 }, (err, address) => {
-  if (err) {
-    console.error(err)
-    process.exit(1)
+connectToReadDB().then(() => { 
+  server.listen({ port: 8080 }, (err, address) => {
+    if (err) {
+      console.error(err)
+      process.exit(1)
+    }
+    console.log(`Server listening at ${address}`)
   }
-  console.log(`Server listening at ${address}`)
-})
+)})

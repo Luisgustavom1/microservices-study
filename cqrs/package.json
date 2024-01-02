@@ -9,6 +9,7 @@
 	"dependencies": {
 		"drizzle-orm": "^0.29.2",
 		"fastify": "^4.25.2",
+		"mongodb": "6.3",
 		"mysql2": "^3.6.5"
 	},
 	"devDependencies": {

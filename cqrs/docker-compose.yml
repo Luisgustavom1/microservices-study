@@ -17,5 +17,17 @@ services:
     ports:
       - 3306:3306
 
+  read-db:
+    image: mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "moneta_flow"
+      MONGO_INITDB_ROOT_PASSWORD: "0sW6pg5Yj0ylM{iy"
+    volumes:
+      - database-read:/data/db
+    ports:
+      - 27017:27017
+    
 volumes:
   database:
+  database-read:

@@ -3,6 +3,8 @@ import { DepositDTO } from "../controllers/transaction";
 import { db } from "../db";
 import { account } from "../db/schema/account";
 import { transaction } from "../db/schema/transaction";
+import { collections } from "../db-read";
+import { TransactionType } from "../db-read/collections/transaction";
 
 export class TransactionDomain {
   private readonly db = db;
@@ -11,6 +13,7 @@ export class TransactionDomain {
     try {
       const [accountToDeposit] = await db.select({
         id: account.id,
+        wallet: account.wallet,
       }).from(account).where(
         eq(account.wallet, depositInput.wallet)
       );
@@ -26,6 +29,15 @@ export class TransactionDomain {
         type: "deposit",
       });
 
+      await collections.transaction?.insertOne({ 
+        type: TransactionType.deposit, 
+        transactionId: transactionCreated.insertId,
+        currency: depositInput.currency, 
+        amount: String(depositInput.amount), 
+        wallet: accountToDeposit.wallet,
+        created_at: new Date().getTime(), 
+      })
+
       // eventual consistency when using a message broker
       return { success: true, id: transactionCreated.insertId }
     } catch (error) {
@@ -38,17 +50,7 @@ export class TransactionDomain {
 
   public async list(wallet: string) {
     try {
-      const transactions = await db
-        .select({
-          id: transaction.id,
-          type: transaction.type,
-          currency: transaction.currency,
-          amount: transaction.amount,
-          created_at: transaction.created_at,
-        })
-        .from(transaction)
-        .innerJoin(account, eq(transaction.accountId, account.id))
-        .where(eq(account.wallet, wallet))
+      const transactions = await collections.transaction?.find({ wallet }).sort({ createdAt: -1 }).limit(10).toArray();
       
       return { success: true, data: transactions }
     } catch (error) {

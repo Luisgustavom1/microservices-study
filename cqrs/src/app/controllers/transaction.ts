@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { TransactionDomain } from "../domain/deposit";
+import { TransactionDomain } from "../domain/transaction";
 
 export class TransactionController {;
   private static readonly transactionDomain = new TransactionDomain();
@@ -17,8 +17,6 @@ export class TransactionController {;
     reply.code(201);
     return output;
   }
-
-  public static withdraw() {}
 
   public static async list(req: FastifyRequest<{ Params: { wallet: string } }>, reply: FastifyReply) {
     const wallet = req.params.wallet;

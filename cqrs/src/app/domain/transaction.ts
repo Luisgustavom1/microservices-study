@@ -39,8 +39,6 @@ export class TransactionDomain {
     }
   }
 
-  public withdraw() {}
-
   public async list(wallet: string) {
     try {
       const transactions = await this.query.list(wallet);

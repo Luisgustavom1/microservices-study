@@ -7,12 +7,30 @@ export abstract class BaseEvent<T = unknown> {
     protected queue: string,
   ) {}
 
-  public abstract publish(
+  public async publish(
     message: unknown,
     options?: amqplib.Options.Publish
-  ): Promise<void>;
+  ): Promise<void> {
+    const ch = await this.connection().createChannel();
+    await ch.assertQueue(this.queue);
+    const buff = Buffer.from(JSON.stringify(message));
+    
+    ch.sendToQueue(this.queue, buff, options);
+  }
 
-  public abstract subscribe(queryService: Listener): Promise<void>;
+  public async subscribe(listener: Listener): Promise<void> {
+    const ch = await this.connection().createChannel();
+    await ch.assertQueue(this.queue);
+
+    ch.consume(this.queue, (msg) => {
+      if (msg !== null) {
+        listener.execute(JSON.parse(msg.content.toString()));
+        ch.ack(msg);
+      } else {
+        console.log('Consumer cancelled by server');
+      }
+    });
+  }
 
   protected connection() {
     return EventBusConnection.connection;

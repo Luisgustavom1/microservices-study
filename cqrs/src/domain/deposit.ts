@@ -45,7 +45,7 @@ export class TransactionDomain {
     try {
       const transactions = await this.query.list(wallet);
       
-      return { success: true, data: transactions }
+      return { success: true, count: transactions?.length, data: transactions }
     } catch (error) {
       console.log("[ERROR]", error);
       return { success: false, error: "Tente novamente mais tarde" };

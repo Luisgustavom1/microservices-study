@@ -8,7 +8,7 @@ export class TransactionController {;
     const body = req.body;
     const depositInput = new DepositDTO(body.amount, body.currency, body.wallet);
     const output = await this.transactionDomain.deposit(depositInput);
-
+    
     if (!output.success) {
       reply.code(400);
       return output;

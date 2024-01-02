@@ -11,6 +11,6 @@ export class TransactionQuery implements Service<InsertOneResult<Transaction>, W
   }
 
   public async list(wallet: string) {
-    return collections.transaction?.find({ wallet }).sort({ createdAt: -1 }).limit(10).toArray();
+    return collections.transaction?.find({ wallet }).toArray();
   }
 }

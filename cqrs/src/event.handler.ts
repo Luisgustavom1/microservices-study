@@ -1,6 +1,6 @@
 import { connectToReadDB } from "./db-read";
 import { EventBusConnection } from "./event-bus/connection";
-import { TransactionEvent } from "./event-bus/events/transaction.event";
+import { TransactionReplicateEvent } from "./event-bus/events/transaction.replicate.event";
 import { QueryListener } from "./listeners/transaction/query.listener";
 import { TransactionQuery } from "./services/transaction/query";
 
@@ -14,7 +14,7 @@ async function init() {
     password: process.env.EVENT_BUS_PASSWORD,
   })
 
-  const eventToListen = new TransactionEvent()
+  const eventToListen = new TransactionReplicateEvent()
   const queryService = new TransactionQuery();
   const listener = new QueryListener(queryService);
 

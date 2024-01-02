@@ -1,7 +1,7 @@
 import { Listener } from "../listener";
 import { Service } from "../../services/Service";
 import { InsertOneResult, OptionalId, OptionalUnlessRequiredId, WithId } from "mongodb";
-import { TransactionEventDTO } from "../../event-bus/events/transaction.event";
+import { TransactionEventDTO } from "../../event-bus/events/transaction.replicate.event";
 import Transaction from "../../db-read/collections/transaction";
 
 export class QueryListener implements Listener {

@@ -2,7 +2,7 @@ import { Listener } from "../listener";
 import { Service } from "../../services/Service";
 import { MySqlRawQueryResult } from "drizzle-orm/mysql2";
 import { BaseEvent } from "../../event-bus/events/base.event";
-import { TransactionEventDTO } from "../../event-bus/events/transaction.event";
+import { TransactionEventDTO } from "../../event-bus/events/transaction.replicate.event";
 import { DepositEventDTO } from "../../event-bus/events/deposit.event";
 
 export class CommandListener implements Listener {

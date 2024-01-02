@@ -1,13 +1,13 @@
 import { BaseEvent } from "./base.event";
 import { TransactionType } from '../../db-read/collections/transaction';
 
-export class TransactionEvent extends BaseEvent {
+export class TransactionReplicateEvent extends BaseEvent {
   constructor() {
     super("transaction.replicate");
   }
 
-  public prepareMessage(message: TransactionEventDTO): TransactionEventDTO {
-    return new TransactionEventDTO(
+  public prepareMessage(message: TransactionReplicateEventDTO): TransactionReplicateEventDTO {
+    return new TransactionReplicateEventDTO(
       message.type, 
       message.transactionId, 
       message.currency, 
@@ -18,7 +18,7 @@ export class TransactionEvent extends BaseEvent {
   }
 }
 
-export class TransactionEventDTO {
+export class TransactionReplicateEventDTO {
   constructor(
     public type: TransactionType, 
     public transactionId: number,

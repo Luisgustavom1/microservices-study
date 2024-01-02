@@ -1,7 +1,7 @@
 import { connectToReadDB } from "./db-read";
 import { EventBusConnection } from "./event-bus/connection";
 import { DepositEvent } from "./event-bus/events/deposit.event";
-import { TransactionEvent } from "./event-bus/events/transaction.event";
+import { TransactionReplicateEvent } from "./event-bus/events/transaction.replicate.event";
 import { CommandListener } from "./listeners/transaction/command.listener";
 import { TransactionCommand } from "./services/transaction/command";
 
@@ -16,7 +16,7 @@ async function init() {
   })
 
   const eventToListen = new DepositEvent()
-  const newEvent = new TransactionEvent();
+  const newEvent = new TransactionReplicateEvent();
   const commandService = new TransactionCommand();
   const listener = new CommandListener(commandService, newEvent);
 

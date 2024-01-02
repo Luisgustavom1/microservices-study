@@ -1,6 +1,4 @@
-import amqplib from 'amqplib';
 import { BaseEvent } from "./base.event";
-import { Listener } from '../../listeners/listener';
 import { TransactionType } from '../../db-read/collections/transaction';
 
 export class DepositEvent extends BaseEvent {

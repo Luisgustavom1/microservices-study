@@ -1,16 +1,15 @@
 ## CQRS Flow
 ```mermaid
 graph TD
-    User[User] --> |Send a command| CommandHandler
-    CommandHandler -->|Success or error| User
+    User[User] --> |Commands - POST| App --> |Send a command| CommandHandler
     CommandHandler --> |Persist data| WriteDb
     CommandHandler --> |Publish command event| Queue
 
-    User --> |Send a query to some data| QueryHandler
-    QueryHandler --> ReadDb 
-    QueryHandler -->|"Result"| User
-    Queue --> |Update data| ReadDb
+    User --> |Queries - GET| App --> |Send a query| QueryHandler --> |Get data| ReadDb
+
+    QueryHandler --> |Subscribe| Queue --> |Update data| ReadDb
     
+    App[Server]
     CommandHandler(Command Handler)
     QueryHandler(Query Handler)
     ReadDb[(Read Database)]

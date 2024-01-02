@@ -7,7 +7,6 @@ export class TransactionQuery implements Service<InsertOneResult<Transaction>, W
   private readonly db = collections.transaction;
 
   public async save(values: OptionalUnlessRequiredId<Transaction>) {
-    console.log('values to save', values )
     return this.db?.insertOne(values)
   }
 

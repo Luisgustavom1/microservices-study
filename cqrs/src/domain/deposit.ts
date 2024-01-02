@@ -47,7 +47,7 @@ export class TransactionDomain {
       
       return { success: true, data: transactions }
     } catch (error) {
-      console.log("deu erro", error);
+      console.log("[ERROR]", error);
       return { success: false, error: "Tente novamente mais tarde" };
     }
   }

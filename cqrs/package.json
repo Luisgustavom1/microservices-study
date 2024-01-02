@@ -1,9 +1,9 @@
 {
 	"scripts": {
-		"dev": "nodemon --watch src src/index.ts",
+		"dev": "nodemon --watch src src/app.ts",
 		"dev:event-handler": "nodemon --watch src src/event.handler.ts",
 		"dev:command-handler": "nodemon --watch src src/command.handler.ts",
-		"start": "node index.js",
+		"start": "node app.js",
 		"build": "tsc -p tsconfig.json",
 		"db:migrate": "ts-node --files ./src/db/migrate.ts",
 		"db:generate": "drizzle-kit generate:mysql"

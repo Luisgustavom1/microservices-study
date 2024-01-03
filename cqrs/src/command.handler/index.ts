@@ -1,13 +1,10 @@
-import { connectToReadDB } from "./db-read";
-import { EventBusConnection } from "./event-bus/connection";
-import { DepositEvent } from "./event-bus/events/deposit.event";
-import { TransactionReplicateEvent } from "./event-bus/events/transaction.replicate.event";
-import { CommandListener } from "./listeners/transaction/command.listener";
-import { TransactionCommand } from "./services/transaction/command";
+import { EventBusConnection } from "@event-bus/connection";
+import { DepositEvent } from "@event-bus/events/deposit.event";
+import { TransactionReplicateEvent } from "@event-bus/events/transaction.replicate.event";
+import { CommandListener } from "./command.listener";
+import { TransactionCommand } from "./services/command";
 
 async function init() {
-  await connectToReadDB();
-
   await EventBusConnection.connect({
     host: process.env.EVENT_BUS_HOST,
     port: Number(process.env.EVENT_BUS_PORT),

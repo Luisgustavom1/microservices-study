@@ -1,7 +1,7 @@
 import { MySqlInsertValue } from "drizzle-orm/mysql-core";
-import { db } from "../../db";
-import { Transaction, transaction } from "../../db/schema/transaction";
-import { Service } from "../Service";
+import { db } from "../db";
+import { Transaction, transaction } from "../db/schema/transaction";
+import { Service } from "@contracts/Service";
 import { MySqlRawQueryResult } from "drizzle-orm/mysql2";
 
 export class TransactionCommand implements Service<MySqlRawQueryResult, void> {

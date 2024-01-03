@@ -1,6 +1,6 @@
 import amqplib from 'amqplib';
 import { EventBusConnection } from '../connection';
-import { Listener } from '../../listeners/listener';
+import { Listener } from "@contracts/Listener";
 
 export abstract class BaseEvent<T = unknown> {
   constructor(

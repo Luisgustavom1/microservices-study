@@ -1,7 +1,7 @@
 import fastify from 'fastify'
-import { TransactionController, DepositDTO } from "./app/controllers/transaction";
-import { connectToReadDB } from './db-read';
-import { EventBusConnection } from './event-bus/connection';
+import { TransactionController, DepositDTO } from "./controllers/transaction";
+import { connectToReadDB } from '@query.handler/db';
+import { EventBusConnection } from '@event-bus/connection';
 
 const server = fastify()
 

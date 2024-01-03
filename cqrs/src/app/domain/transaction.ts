@@ -1,9 +1,9 @@
 import { eq } from "drizzle-orm";
 import { DepositDTO } from "../controllers/transaction";
-import { db } from "../../db";
-import { account } from "../../db/schema/account";
-import { TransactionQuery } from "../../services/transaction/query";
-import { DepositEvent } from "../../event-bus/events/deposit.event";
+import { db } from "@command.handler/db";
+import { account } from "@command.handler/db/schema/account";
+import { TransactionQuery } from "@query.handler/services/query";
+import { DepositEvent } from "@event-bus/events/deposit.event";
 
 export class TransactionDomain {
   // TODO: inject dependencies

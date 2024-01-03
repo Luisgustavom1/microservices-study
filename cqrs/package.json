@@ -1,8 +1,8 @@
 {
 	"scripts": {
-		"dev": "nodemon --watch src src/app.ts",
-		"dev:event-handler": "nodemon --watch src src/event.handler.ts",
-		"dev:command-handler": "nodemon --watch src src/command.handler.ts",
+		"dev": "nodemon --watch src -r tsconfig-paths/register src/app/index.ts",
+		"dev:query-handler": "nodemon --watch src/query.handler -r tsconfig-paths/register src/query.handler/index.ts",
+		"dev:command-handler": "nodemon --watch src/command.handler -r tsconfig-paths/register src/command.handler/index.ts",
 		"start": "node app.js",
 		"build": "tsc -p tsconfig.json",
 		"db:migrate": "ts-node --files ./src/db/migrate.ts",
@@ -22,6 +22,7 @@
 		"drizzle-kit": "^0.20.9",
 		"nodemon": "^3.0.2",
 		"ts-node": "^10.9.2",
+		"tsconfig-paths": "^4.2.0",
 		"typescript": "^5.3.3"
 	}
 }

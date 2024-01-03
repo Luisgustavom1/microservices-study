@@ -1,8 +1,8 @@
-import { connectToReadDB } from "./db-read";
-import { EventBusConnection } from "./event-bus/connection";
-import { TransactionReplicateEvent } from "./event-bus/events/transaction.replicate.event";
-import { QueryListener } from "./listeners/transaction/query.listener";
-import { TransactionQuery } from "./services/transaction/query";
+import { EventBusConnection } from "@event-bus/connection";
+import { TransactionReplicateEvent } from "@event-bus/events/transaction.replicate.event";
+import { connectToReadDB } from "./db";
+import { QueryListener } from "./query.listener";
+import { TransactionQuery } from "./services/query";
 
 async function init() {
   await connectToReadDB();

@@ -1,7 +1,7 @@
 import { InsertOneResult, OptionalUnlessRequiredId, WithId } from "mongodb";
-import { collections } from "../../db-read";
-import Transaction from "../../db-read/collections/transaction";
-import { Service } from "../Service";
+import { Service } from "@contracts/Service";
+import { collections } from "../db";
+import Transaction from "../db/collections/transaction";
 
 export class TransactionQuery implements Service<InsertOneResult<Transaction>, WithId<Transaction>[]> {
   private readonly db = collections.transaction;

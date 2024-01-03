@@ -1,15 +1,15 @@
-import { Listener } from "../listener";
-import { Service } from "../../services/Service";
 import { MySqlRawQueryResult } from "drizzle-orm/mysql2";
-import { BaseEvent } from "../../event-bus/events/base.event";
-import { TransactionEventDTO } from "../../event-bus/events/transaction.replicate.event";
-import { DepositEventDTO } from "../../event-bus/events/deposit.event";
+import { BaseEvent } from "@event-bus/events/base.event";
+import { TransactionReplicateEventDTO } from "@event-bus/events/transaction.replicate.event";
+import { DepositEventDTO } from "@event-bus/events/deposit.event";
+import { Listener } from "@contracts/Listener";
+import { Service } from "@contracts/Service";
 
 export class CommandListener implements Listener {
   constructor (
     // TODO: dynamic methods params
     private readonly service: Service<MySqlRawQueryResult>,
-    private readonly eventBus: BaseEvent<TransactionEventDTO>,
+    private readonly eventBus: BaseEvent<TransactionReplicateEventDTO>,
   ) {}
 
   async execute(values: DepositEventDTO): Promise<void> {

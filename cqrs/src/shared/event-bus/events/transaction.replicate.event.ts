@@ -1,5 +1,5 @@
 import { BaseEvent } from "./base.event";
-import { TransactionType } from '../../db-read/collections/transaction';
+import { TransactionType } from '../../../query.handler/db/collections/transaction';
 
 export class TransactionReplicateEvent extends BaseEvent {
   constructor() {

@@ -17,13 +17,13 @@ async function init() {
   await connectToReadDB();
 
   await EventBusConnection.connect({
-    host: process.env.EVENT_BUS_HOST,
+    hostname: process.env.EVENT_BUS_HOST,
     port: Number(process.env.EVENT_BUS_PORT),
     username: process.env.EVENT_BUS_USERNAME,
     password: process.env.EVENT_BUS_PASSWORD,
   })
 
-  server.listen({ port: 8080 }, (err, address) => {
+  server.listen({ port: 8080, host: '0.0.0.0' }, (err, address) => {
     if (err) {
       console.error(err)
       process.exit(1)

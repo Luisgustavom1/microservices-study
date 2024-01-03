@@ -1,19 +1,12 @@
 import amqplib from 'amqplib';
 
-type ConnectionOptions = {
-  host?: string;
-  port?: number;
-  username?: string;
-  password?: string;
-};
-
 export class EventBusConnection {
   private static _conn: amqplib.Connection;
 
   public constructor() {}
 
   static async connect(
-    connectionData: ConnectionOptions = {}
+    connectionData: amqplib.Options.Connect = {}
   ): Promise<amqplib.Connection> {
     if (!EventBusConnection._conn) {
       try {

@@ -16,6 +16,8 @@ services:
       - 3306
     ports:
       - 3306:3306
+    networks:
+      - db
 
   read-db:
     image: mongo
@@ -28,6 +30,8 @@ services:
       - database-read:/data/db
     ports:
       - 27017:27017
+    networks:
+      - read-db
     
   event-bus:
     image: rabbitmq:3.8-management
@@ -43,6 +47,71 @@ services:
     ports:
       - 5672:5672
       - 15672:15672
+    networks:
+      - event-bus
+
+  api:
+    container_name: api
+    build: .
+    restart: always
+    ports:
+      - 8080:8080
+    env_file:
+      - .env
+    command:
+      - "pnpm"
+      - "dev"
+    volumes:
+      - ./:/app
+    depends_on:
+      - db
+      - read-db
+      - event-bus
+    networks:
+      - db
+      - read-db
+      - event-bus
+    
+  command-handler:
+    container_name: command-handler
+    build: .
+    restart: always
+    env_file:
+      - .env
+    command:
+      - "pnpm"
+      - "dev:command-handler"
+    volumes:
+      - ./:/app
+    depends_on:
+      - api
+    networks:
+      - db
+      - read-db
+      - event-bus
+  
+  query-handler:
+    container_name: query-handler
+    build: .
+    restart: always
+    env_file:
+      - .env
+    command:
+      - "pnpm"
+      - "dev:query-handler"
+    volumes:
+      - ./:/app
+    depends_on:
+      - api
+    networks:
+      - db
+      - read-db
+      - event-bus
+
+networks:
+  event-bus:
+  db:
+  read-db:
 
 volumes:
   database:

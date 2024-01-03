@@ -2,13 +2,15 @@ import { eq } from "drizzle-orm";
 import { DepositDTO } from "../controllers/transaction";
 import { db } from "@command.handler/db";
 import { account } from "@command.handler/db/schema/account";
-import { TransactionQuery } from "@query.handler/services/query";
 import { DepositEvent } from "@event-bus/events/deposit.event";
+import { Service } from "@query.handler/services";
 
 export class TransactionDomain {
-  // TODO: inject dependencies
   private readonly depositBus = new DepositEvent();
-  private readonly query = new TransactionQuery();
+  
+  constructor (
+    private readonly query: Service
+  ) {}
 
   public async deposit(depositInput: DepositDTO) {
     try {

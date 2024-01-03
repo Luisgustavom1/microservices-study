@@ -1,8 +1,9 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { TransactionDomain } from "../domain/transaction";
+import { TransactionQuery } from "@query.handler/services/query";
 
 export class TransactionController {;
-  private static readonly transactionDomain = new TransactionDomain();
+  private static readonly transactionDomain = new TransactionDomain(new TransactionQuery());
 
   public static async deposit(req: FastifyRequest<{ Body: DepositDTO;}>, reply: FastifyReply) {
     const body = req.body;

@@ -1,4 +1,3 @@
-import { MySqlRawQueryResult } from "drizzle-orm/mysql2";
 import { BaseEvent } from "@event-bus/events/base.event";
 import { TransactionReplicateEventDTO } from "@event-bus/events/transaction.replicate.event";
 import { DepositEventDTO } from "@event-bus/events/deposit.event";

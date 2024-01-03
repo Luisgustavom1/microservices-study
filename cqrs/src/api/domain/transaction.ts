@@ -41,7 +41,7 @@ export class TransactionDomain {
 
   public async list(wallet: string) {
     try {
-      const transactions = await this.query.list(wallet);
+      const transactions = await this.query.list({ wallet });
       
       return { success: true, count: transactions?.length, data: transactions }
     } catch (error) {

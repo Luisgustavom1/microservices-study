@@ -11,6 +11,6 @@ export class TransactionQuery implements Service {
   }
 
   public async list(where: { wallet: string }) {
-    return collections.transaction?.find({ where }).toArray();
+    return collections.transaction?.find(where).toArray();
   }
 }

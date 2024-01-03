@@ -1,9 +1,8 @@
 {
 	"scripts": {
-		"dev": "nodemon --watch src -r tsconfig-paths/register src/app/index.ts",
+		"dev": "nodemon --watch src -r tsconfig-paths/register src/api/index.ts",
 		"dev:query-handler": "nodemon --watch src/query.handler -r tsconfig-paths/register src/query.handler/index.ts",
 		"dev:command-handler": "nodemon --watch src/command.handler -r tsconfig-paths/register src/command.handler/index.ts",
-		"start": "node app.js",
 		"build": "tsc -p tsconfig.json",
 		"db:migrate": "ts-node --files ./src/db/migrate.ts",
 		"db:generate": "drizzle-kit generate:mysql"

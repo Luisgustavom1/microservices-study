@@ -1,4 +1,4 @@
-import { Listener } from "@contracts/Listener";
+import { Listener } from "@event-bus/Listener";
 import { TransactionReplicateEventDTO } from "@event-bus/events/transaction.replicate.event";
 import { Service } from "@query.handler/services";
 

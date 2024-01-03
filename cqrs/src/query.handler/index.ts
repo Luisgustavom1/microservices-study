@@ -15,8 +15,7 @@ async function init() {
   })
 
   const eventToListen = new TransactionReplicateEvent()
-  const queryService = new TransactionQuery();
-  const listener = new QueryListener(queryService);
+  const listener = new QueryListener(new TransactionQuery());
 
   eventToListen.subscribe(listener)
 }

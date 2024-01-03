@@ -13,9 +13,10 @@ async function init() {
   })
 
   const eventToListen = new DepositEvent()
-  const eventBus = new TransactionReplicateEvent();
-  const commandService = new TransactionCommand();
-  const listener = new CommandListener(commandService, eventBus);
+  const listener = new CommandListener(
+    new TransactionCommand(), 
+    new TransactionReplicateEvent()
+  );
 
   eventToListen.subscribe(listener)
 }

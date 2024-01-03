@@ -1,7 +1,7 @@
 import { BaseEvent } from "@event-bus/events/base.event";
 import { TransactionReplicateEventDTO } from "@event-bus/events/transaction.replicate.event";
 import { DepositEventDTO } from "@event-bus/events/deposit.event";
-import { Listener } from "@contracts/Listener";
+import { Listener } from "@event-bus/Listener";
 import { Service } from "@command.handler/services";
 
 export class CommandListener implements Listener {

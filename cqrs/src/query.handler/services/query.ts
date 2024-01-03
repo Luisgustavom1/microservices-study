@@ -1,16 +1,16 @@
-import { InsertOneResult, OptionalUnlessRequiredId, WithId } from "mongodb";
-import { Service } from "@contracts/Service";
+import { OptionalUnlessRequiredId } from "mongodb";
+import Transaction from "@query.handler/db/collections/transaction";
 import { collections } from "../db";
-import Transaction from "../db/collections/transaction";
+import { Service } from ".";
 
-export class TransactionQuery implements Service<InsertOneResult<Transaction>, WithId<Transaction>[]> {
+export class TransactionQuery implements Service {
   private readonly db = collections.transaction;
 
   public async save(values: OptionalUnlessRequiredId<Transaction>) {
     return this.db?.insertOne(values)
   }
 
-  public async list(wallet: string) {
-    return collections.transaction?.find({ wallet }).toArray();
+  public async list(where: { wallet: string }) {
+    return collections.transaction?.find({ where }).toArray();
   }
 }

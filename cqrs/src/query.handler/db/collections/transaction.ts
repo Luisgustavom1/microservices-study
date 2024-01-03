@@ -1,17 +1,15 @@
-import { Collection, ObjectId } from "mongodb";
+import { ObjectId } from "mongodb";
 
-export default class Transaction extends Collection {
+export default class Transaction {
   constructor(
-    public id: ObjectId,
     public transactionId: number,
     public type: TransactionType,
     public wallet: string,
     public currency: string,
     public amount: string,
     public created_at: number,
-  ) {
-    super();
-  }
+    public _id: ObjectId,
+  ) {}
 }
 
 export enum TransactionType {

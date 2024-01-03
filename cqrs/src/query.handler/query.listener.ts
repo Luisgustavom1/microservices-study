@@ -1,13 +1,10 @@
-import { InsertOneResult, WithId } from "mongodb";
 import { Listener } from "@contracts/Listener";
-import { Service } from "@contracts/Service";
 import { TransactionReplicateEventDTO } from "@event-bus/events/transaction.replicate.event";
-import Transaction from "./db/collections/transaction";
+import { Service } from "@query.handler/services";
 
 export class QueryListener implements Listener {
   constructor(
-    // TODO: dynamic methods params
-    private readonly service: Service<InsertOneResult<Transaction>, WithId<Transaction>[]>,
+    private readonly service: Service,
   ) {}
 
   async execute(values: TransactionReplicateEventDTO): Promise<void> {

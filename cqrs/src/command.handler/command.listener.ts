@@ -3,12 +3,11 @@ import { BaseEvent } from "@event-bus/events/base.event";
 import { TransactionReplicateEventDTO } from "@event-bus/events/transaction.replicate.event";
 import { DepositEventDTO } from "@event-bus/events/deposit.event";
 import { Listener } from "@contracts/Listener";
-import { Service } from "@contracts/Service";
+import { Service } from "@command.handler/services";
 
 export class CommandListener implements Listener {
   constructor (
-    // TODO: dynamic methods params
-    private readonly service: Service<MySqlRawQueryResult>,
+    private readonly service: Service,
     private readonly eventBus: BaseEvent<TransactionReplicateEventDTO>,
   ) {}
 

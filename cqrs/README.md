@@ -4,12 +4,12 @@
 title: Command Flow
 ---
 graph TD
-    User --> |Commands - POST| App --> |Publish command event| Queue
+    User --> |1 - Commands - POST| App --> |2 - Publish new command| Queue
     
-    Queue --> |Listen| CommandHandler --> |Persist Data| WriteDb
-    CommandHandler --> |Sent Finish Command| Queue
+    Queue --> |3 - Listen| CommandHandler --> |Persist Data| WriteDb
+    CommandHandler --> |4 - Publish Finish Command| Queue
 
-    Queue --> |Listen| QueryHandler --> |Update data| ReadDb
+    Queue --> |5 - Listen| QueryHandler --> |Update data| ReadDb
 
     User[User]
     App[Server]

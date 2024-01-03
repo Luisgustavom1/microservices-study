@@ -53,7 +53,6 @@ services:
   api:
     container_name: api
     build: .
-    restart: always
     ports:
       - 8080:8080
     env_file:
@@ -75,7 +74,6 @@ services:
   command-handler:
     container_name: command-handler
     build: .
-    restart: always
     env_file:
       - .env
     command:
@@ -93,7 +91,6 @@ services:
   query-handler:
     container_name: query-handler
     build: .
-    restart: always
     env_file:
       - .env
     command:

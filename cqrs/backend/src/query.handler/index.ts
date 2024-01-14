@@ -2,7 +2,7 @@ import { EventBusConnection } from "@event-bus/connection";
 import { TransactionReplicateEvent } from "@event-bus/events/transaction.replicate.event";
 import { connectToReadDB } from "./db";
 import { QueryListener } from "./query.listener";
-import { TransactionQuery } from "./services/query";
+import { TransactionQuery } from "./repository/transaction";
 
 async function init() {
   await connectToReadDB();

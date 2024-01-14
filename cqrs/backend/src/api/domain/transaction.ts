@@ -3,13 +3,13 @@ import { DepositDTO } from "../controllers/transaction";
 import { db } from "@command.handler/db";
 import { account } from "@command.handler/db/schema/account";
 import { DepositEvent } from "@event-bus/events/deposit.event";
-import { Service } from "@query.handler/services";
+import { TransactionQueryRepository } from "@query.handler/repository";
 
 export class TransactionDomain {
   private readonly depositBus = new DepositEvent();
   
   constructor (
-    private readonly query: Service
+    private readonly query: TransactionQueryRepository
   ) {}
 
   public async deposit(depositInput: DepositDTO) {

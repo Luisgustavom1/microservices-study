@@ -1,10 +1,10 @@
 import { Listener } from "@event-bus/Listener";
 import { TransactionReplicateEventDTO } from "@event-bus/events/transaction.replicate.event";
-import { Service } from "@query.handler/services";
+import { TransactionQueryRepository } from "@query.handler/repository";
 
 export class QueryListener implements Listener {
   constructor(
-    private readonly service: Service,
+    private readonly service: TransactionQueryRepository,
   ) {}
 
   async execute(values: TransactionReplicateEventDTO): Promise<void> {

@@ -1,9 +1,9 @@
 import { OptionalUnlessRequiredId } from "mongodb";
 import Transaction from "@query.handler/db/collections/transaction";
 import { collections } from "../db";
-import { Service } from ".";
+import { TransactionQueryRepository } from ".";
 
-export class TransactionQuery implements Service {
+export class TransactionQuery implements TransactionQueryRepository {
   private readonly db = collections.transaction;
 
   public async save(values: OptionalUnlessRequiredId<Transaction>) {

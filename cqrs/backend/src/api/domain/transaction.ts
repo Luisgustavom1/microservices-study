@@ -1,18 +1,19 @@
 import { eq } from "drizzle-orm";
-import { DepositDTO } from "../controllers/transaction";
+import { TransactionDTO } from "../controllers/transaction";
 import { db } from "@command.handler/db";
 import { account } from "@command.handler/db/schema/account";
-import { DepositEvent } from "@event-bus/events/deposit.event";
+import { TransactionEvent } from "@event-bus/events/transaction.event";
 import { TransactionQueryRepository } from "@query.handler/repository";
+import { TransactionType } from "@query.handler/db/collections/transaction";
 
 export class TransactionDomain {
-  private readonly depositBus = new DepositEvent();
+  private readonly transactionBus = new TransactionEvent();
   
   constructor (
     private readonly query: TransactionQueryRepository
   ) {}
 
-  public async deposit(depositInput: DepositDTO) {
+  public async deposit(depositInput: TransactionDTO) {
     try {
       const [accountToDeposit] = await db.select({
         id: account.id,
@@ -25,13 +26,50 @@ export class TransactionDomain {
         return { success: false, error: "Conta não encontrada" };
       }
 
-      const message = this.depositBus.prepareMessage({ 
+      const message = this.transactionBus.prepareMessage({ 
+        type: TransactionType.deposit,
         accountId: accountToDeposit.id,
         currency: depositInput.currency, 
         amount: depositInput.amount, 
         wallet: accountToDeposit.wallet,
       })
-      this.depositBus.publish(message)
+      this.transactionBus.publish(message)
+
+      // eventual consistency when using a message broker
+      return { success: true }
+    } catch (error) {
+      console.log("[ERROR]", error);
+      return { success: false, error: "Tente novamente mais tarde" };
+    }
+  } 
+
+  public async withdraw(withdrawInput: TransactionDTO) {
+    try {
+      const [accountToDeposit] = await db.select({
+        id: account.id,
+        wallet: account.wallet,
+        balance: account.balance,
+      }).from(account).where(
+        eq(account.wallet, withdrawInput.wallet)
+      );
+
+      if (!accountToDeposit) {
+        return { success: false, error: "Conta não encontrada" };
+      }
+
+      const insufficientBalance = Number(accountToDeposit.balance) <  withdrawInput.amount
+      if (insufficientBalance) {
+        return { success: false, error: "Saldo insuficiente" };
+      }
+
+      const message = this.transactionBus.prepareMessage({ 
+        type: TransactionType.withdrawal,
+        accountId: accountToDeposit.id,
+        currency: withdrawInput.currency, 
+        amount: withdrawInput.amount, 
+        wallet: accountToDeposit.wallet,
+      })
+      this.transactionBus.publish(message)
 
       // eventual consistency when using a message broker
       return { success: true }

@@ -1,14 +1,16 @@
 import { BaseEvent } from "./base.event";
 import { TransactionType } from '../../../query.handler/db/collections/transaction';
 
-export class DepositEvent extends BaseEvent {
+export class TransactionEvent extends BaseEvent {
+  static readonly QUEUE_NAME = "transaction";
+
   constructor() {
-    super("deposit");
+    super(TransactionEvent.QUEUE_NAME);
   }
 
-  public prepareMessage(message: Omit<DepositEventDTO, "type" | "created_at">): DepositEventDTO {
-    return new DepositEventDTO(
-      TransactionType.deposit, 
+  public prepareMessage(message: TransactionEventDTO): TransactionEventDTO {
+    return new TransactionEventDTO(
+      message.type, 
       message.accountId,
       message.amount, 
       message.currency, 
@@ -16,9 +18,9 @@ export class DepositEvent extends BaseEvent {
     );
   }
 }
-export class DepositEventDTO {
+export class TransactionEventDTO {
   constructor(
-    public type: TransactionType.deposit,
+    public type: TransactionType,
     public accountId: number,
     public amount: number, 
     public currency: string, 

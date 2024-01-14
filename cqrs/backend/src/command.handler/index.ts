@@ -1,5 +1,5 @@
 import { EventBusConnection } from "@event-bus/connection";
-import { DepositEvent } from "@event-bus/events/deposit.event";
+import { TransactionEvent } from "@event-bus/events/transaction.event";
 import { TransactionReplicateEvent } from "@event-bus/events/transaction.replicate.event";
 import { CommandListener } from "./command.listener";
 import { TransactionCommand } from "./repository/command";
@@ -12,7 +12,7 @@ async function init() {
     password: process.env.EVENT_BUS_PASSWORD,
   })
 
-  const eventToListen = new DepositEvent()
+  const eventToListen = new TransactionEvent()
   const listener = new CommandListener(
     new TransactionCommand(), 
     new TransactionReplicateEvent()

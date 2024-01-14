@@ -2,8 +2,10 @@ import { BaseEvent } from "./base.event";
 import { TransactionType } from '../../../query.handler/db/collections/transaction';
 
 export class TransactionReplicateEvent extends BaseEvent {
+  static readonly QUEUE_NAME = "transaction.replicate";
+
   constructor() {
-    super("transaction.replicate");
+    super(TransactionReplicateEvent.QUEUE_NAME);
   }
 
   public prepareMessage(message: TransactionReplicateEventDTO): TransactionReplicateEventDTO {

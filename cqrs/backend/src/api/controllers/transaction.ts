@@ -5,10 +5,9 @@ import { TransactionQuery } from "@query.handler/repository/transaction";
 export class TransactionController {;
   private static readonly transactionDomain = new TransactionDomain(new TransactionQuery());
 
-  public static async deposit(req: FastifyRequest<{ Body: DepositDTO;}>, reply: FastifyReply) {
-    const body = req.body;
-    const depositInput = new DepositDTO(body.amount, body.currency, body.wallet);
-    const output = await this.transactionDomain.deposit(depositInput);
+  public static async deposit(req: FastifyRequest<{ Body: TransactionDTO;}>, reply: FastifyReply) {
+    const input = this.transactionHandler(req);
+    const output = await this.transactionDomain.deposit(input);
     
     if (!output.success) {
       reply.code(400);
@@ -17,6 +16,25 @@ export class TransactionController {;
 
     reply.code(201);
     return output;
+  }
+
+  public static async withdrawal(req: FastifyRequest<{ Body: TransactionDTO;}>, reply: FastifyReply) {
+    const input = this.transactionHandler(req);
+    const output = await this.transactionDomain.withdraw(input);
+    
+    if (!output.success) {
+      reply.code(400);
+      return output;
+    }
+
+    reply.code(201);
+    return output;
+  }
+
+  private static transactionHandler(req: FastifyRequest<{ Body: TransactionDTO;}>) {
+    const body = req.body;
+    const transactionInput = new TransactionDTO(body.amount, body.currency, body.wallet);
+    return transactionInput
   }
 
   public static async list(req: FastifyRequest<{ Params: { wallet: string } }>, reply: FastifyReply) {
@@ -33,7 +51,7 @@ export class TransactionController {;
   }
 }
 
-export class DepositDTO {
+export class TransactionDTO {
   constructor(
     public amount: number, 
     public currency: string, 
@@ -41,6 +59,6 @@ export class DepositDTO {
   ) {}
 
   toString() {
-    return `DepositDTO(amount: ${this.amount}, currency: ${this.currency}, wallet: ${this.wallet})`;
+    return `TransactionDTO(amount: ${this.amount}, currency: ${this.currency}, wallet: ${this.wallet})`;
   }
 }

@@ -1,6 +1,6 @@
 import { BaseEvent } from "@event-bus/events/base.event";
 import { TransactionReplicateEventDTO } from "@event-bus/events/transaction.replicate.event";
-import { DepositEventDTO } from "@event-bus/events/deposit.event";
+import { TransactionEventDTO } from "@event-bus/events/transaction.event";
 import { Listener } from "@event-bus/Listener";
 import { TransactionCommandRepository } from "@command.handler/repository";
 
@@ -10,7 +10,7 @@ export class CommandListener implements Listener {
     private readonly eventBus: BaseEvent<TransactionReplicateEventDTO>,
   ) {}
 
-  async execute(values: DepositEventDTO): Promise<void> {
+  async execute(values: TransactionEventDTO): Promise<void> {
     const amountParsed = String(values.amount);
     const createdAt = new Date();
 

@@ -1,17 +1,11 @@
 import fastify from 'fastify'
-import { TransactionController, DepositDTO } from "./controllers/transaction";
 import { connectToReadDB } from '@query.handler/db';
 import { EventBusConnection } from '@event-bus/connection';
+import { initRoutes } from './controllers/routes';
 
 const server = fastify()
 
-server.post<{ Body: DepositDTO }>('/deposit', async (request, reply) => {
-  return TransactionController.deposit(request, reply);
-})
-
-server.get<{ Params: { wallet: string } }>('/transaction/:wallet', async (request, reply) => {
-  return TransactionController.list(request, reply);
-})
+initRoutes(server)
 
 async function init() {
   await connectToReadDB();

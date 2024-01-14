@@ -2,11 +2,11 @@ import { BaseEvent } from "@event-bus/events/base.event";
 import { TransactionReplicateEventDTO } from "@event-bus/events/transaction.replicate.event";
 import { DepositEventDTO } from "@event-bus/events/deposit.event";
 import { Listener } from "@event-bus/Listener";
-import { Service } from "@command.handler/services";
+import { TransactionCommandRepository } from "@command.handler/repository";
 
 export class CommandListener implements Listener {
   constructor (
-    private readonly service: Service,
+    private readonly service: TransactionCommandRepository,
     private readonly eventBus: BaseEvent<TransactionReplicateEventDTO>,
   ) {}
 

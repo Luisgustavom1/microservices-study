@@ -2,7 +2,7 @@ import { EventBusConnection } from "@event-bus/connection";
 import { DepositEvent } from "@event-bus/events/deposit.event";
 import { TransactionReplicateEvent } from "@event-bus/events/transaction.replicate.event";
 import { CommandListener } from "./command.listener";
-import { TransactionCommand } from "./services/command";
+import { TransactionCommand } from "./repository/command";
 
 async function init() {
   await EventBusConnection.connect({

@@ -1,9 +1,9 @@
 import { MySqlInsertValue } from "drizzle-orm/mysql-core";
 import { db } from "@command.handler/db";
 import { Transaction, transaction } from "@command.handler/db/schema/transaction";
-import { Service } from ".";
+import { TransactionCommandRepository } from ".";
 
-export class TransactionCommand implements Service {
+export class TransactionCommand implements TransactionCommandRepository {
   private readonly db = db;
 
   public async save(values: MySqlInsertValue<Transaction>) {

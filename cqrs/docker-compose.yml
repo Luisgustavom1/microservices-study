@@ -52,16 +52,16 @@ services:
 
   api:
     container_name: api
-    build: .
+    build: ./backend
     ports:
       - 8080:8080
     env_file:
-      - .env
+      - ./backend/.env
     command:
       - "pnpm"
       - "dev"
     volumes:
-      - ./:/app
+      - ./backend:/app
     depends_on:
       - db
       - read-db
@@ -73,14 +73,14 @@ services:
     
   command-handler:
     container_name: command-handler
-    build: .
+    build: ./backend
     env_file:
-      - .env
+      - ./backend/.env
     command:
       - "pnpm"
       - "dev:command-handler"
     volumes:
-      - ./:/app
+      - ./backend:/app
     depends_on:
       - api
     networks:
@@ -90,14 +90,14 @@ services:
   
   query-handler:
     container_name: query-handler
-    build: .
+    build: ./backend
     env_file:
-      - .env
+      - ./backend/.env
     command:
       - "pnpm"
       - "dev:query-handler"
     volumes:
-      - ./:/app
+      - ./backend:/app
     depends_on:
       - api
     networks:

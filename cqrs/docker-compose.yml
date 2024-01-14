@@ -83,6 +83,7 @@ services:
       - ./backend:/app
     depends_on:
       - api
+      - event-bus
     networks:
       - db
       - read-db
@@ -100,6 +101,7 @@ services:
       - ./backend:/app
     depends_on:
       - api
+      - event-bus
     networks:
       - db
       - read-db

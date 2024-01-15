@@ -10,4 +10,5 @@ export const account = mysqlTable('account', {
     scale: 2,
   }).default('0.00'),
   opened_at: timestamp("opened_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updated_at: timestamp("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });

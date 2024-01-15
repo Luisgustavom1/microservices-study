@@ -1,5 +1,5 @@
 import { BaseEvent } from "./base.event";
-import { TransactionType } from '../../../query.handler/db/collections/transaction';
+import { TransactionType } from '../../../query.handler/models/Transaction';
 
 export class TransactionEvent extends BaseEvent {
   static readonly QUEUE_NAME = "transaction";

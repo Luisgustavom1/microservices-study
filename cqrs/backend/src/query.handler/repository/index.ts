@@ -1,5 +1,5 @@
 import { InsertOneResult, OptionalId, WithId } from "mongodb";
-import Transaction from "@query.handler/db/collections/transaction";
+import { Transaction } from "@query.handler/models/Transaction";
 
 export interface TransactionQueryRepository {
   save(values: OptionalId<Transaction>): Promise<InsertOneResult<Transaction> | undefined>;

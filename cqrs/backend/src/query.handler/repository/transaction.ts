@@ -1,5 +1,5 @@
 import { OptionalUnlessRequiredId } from "mongodb";
-import Transaction from "@query.handler/db/collections/transaction";
+import { Transaction } from "@query.handler/models/Transaction";
 import { collections } from "../db";
 import { TransactionQueryRepository } from ".";
 

@@ -1,6 +1,4 @@
-import { ObjectId } from "mongodb";
-
-export default class Transaction {
+export class Transaction {
   constructor(
     public transactionId: number,
     public type: TransactionType,
@@ -8,7 +6,7 @@ export default class Transaction {
     public currency: string,
     public amount: string,
     public created_at: number,
-    public _id: ObjectId,
+    public _id: string,
   ) {}
 }
 

@@ -4,7 +4,7 @@ import { db } from "@command.handler/db";
 import { account } from "@command.handler/db/schema/account";
 import { TransactionEvent } from "@event-bus/events/transaction.event";
 import { TransactionQueryRepository } from "@query.handler/repository";
-import { TransactionType } from "@query.handler/db/collections/transaction";
+import { TransactionType } from "@query.handler/models/Transaction";
 
 export class TransactionDomain {
   private readonly transactionBus = new TransactionEvent();

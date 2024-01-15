@@ -13,5 +13,3 @@ export const transaction = mysqlTable('transaction', {
   }).default('0.00'),
   created_at: timestamp("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
-
-export type Transaction = typeof transaction;

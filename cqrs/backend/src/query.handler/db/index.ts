@@ -1,5 +1,5 @@
 import { MongoClient, Db, Collection } from 'mongodb';
-import Transaction from './collections/transaction';
+import { Transaction } from '../models/Transaction';
 
 export const collections: { transaction?: Collection<Transaction> } = {}
 

@@ -1,7 +1,7 @@
-import { Transaction } from "@command.handler/models/Transaction";
+import { transaction } from "@command.handler/db/schema/transaction";
 import { MySqlInsertValue } from "drizzle-orm/mysql-core";
 import { MySqlRawQueryResult } from "drizzle-orm/mysql2";
 
 export interface TransactionCommandRepository {
-  save(values: MySqlInsertValue<Transaction>): Promise<MySqlRawQueryResult | undefined>;
+  save(values: MySqlInsertValue<typeof transaction>): Promise<MySqlRawQueryResult | undefined>;
 }

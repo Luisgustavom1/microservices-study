@@ -1,3 +1,5 @@
+import { TransactionType } from "@command.handler/models/Transaction";
+
 export class Transaction {
   constructor(
     public transactionId: number,
@@ -8,10 +10,4 @@ export class Transaction {
     public created_at: number,
     public _id: string,
   ) {}
-}
-
-export enum TransactionType {
-  deposit = 'deposit',
-  withdrawal = 'withdrawal',
-  transfer = 'transfer',
 }

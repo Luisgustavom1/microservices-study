@@ -1,3 +1,16 @@
-import { transaction } from "@command.handler/db/schema/transaction";
+export class Transaction {
+  constructor(
+    public id: number,
+    public accountId: number,
+    public type: TransactionType,
+    public currency: string,
+    public amount: string,
+    public created_at: string,
+  ) {}
+}
 
-export type Transaction = typeof transaction;
+export enum TransactionType {
+  deposit = 'deposit',
+  withdrawal = 'withdrawal',
+  transfer = 'transfer',
+}

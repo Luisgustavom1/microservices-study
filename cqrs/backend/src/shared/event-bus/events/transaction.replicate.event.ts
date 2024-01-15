@@ -1,15 +1,15 @@
 import { BaseEvent } from "./base.event";
-import { TransactionType } from '@query.handler/models/Transaction';
+import { TransactionType } from '@command.handler/models/Transaction';
 
-export class TransactionReplicateEvent extends BaseEvent {
+export class TransactionReplicateEvent extends BaseEvent<TransactionReplicateEventData> {
   static readonly QUEUE_NAME = "transaction.replicate";
 
   constructor() {
     super(TransactionReplicateEvent.QUEUE_NAME);
   }
 
-  public prepareMessage(message: TransactionReplicateEventDTO): TransactionReplicateEventDTO {
-    return new TransactionReplicateEventDTO(
+  public prepareMessage(message: TransactionReplicateEventData) {
+    this.data = new TransactionReplicateEventData(
       message.type, 
       message.transactionId, 
       message.currency, 
@@ -20,7 +20,7 @@ export class TransactionReplicateEvent extends BaseEvent {
   }
 }
 
-export class TransactionReplicateEventDTO {
+export class TransactionReplicateEventData {
   constructor(
     public type: TransactionType, 
     public transactionId: number,

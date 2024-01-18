@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { TransactionDomain } from "../domain/transaction";
-import { TransactionQuery } from "@query.handler/repository/transaction";
+import { TransactionQuery } from "@query.handler/repository/transaction.query";
 
 export class TransactionController {;
   private static readonly transactionDomain = new TransactionDomain(new TransactionQuery());

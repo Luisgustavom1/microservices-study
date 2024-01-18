@@ -2,7 +2,7 @@ import { BaseEvent } from "@event-bus/events/base.event";
 import { TransactionReplicateEventData } from "@event-bus/events/transaction.replicate.event";
 import { TransactionEventData } from "@event-bus/events/transaction.event";
 import { Listener } from "@event-bus/Listener";
-import { TransactionCommandRepository } from "@command.handler/repository";
+import { TransactionCommandRepository } from "@command.handler/repository/transaction.command.repository";
 
 export class CommandListener implements Listener {
   constructor (

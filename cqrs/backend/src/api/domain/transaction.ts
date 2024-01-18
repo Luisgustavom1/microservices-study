@@ -10,7 +10,7 @@ export class TransactionDomain {
   private readonly transactionBus = new TransactionEvent();
   
   constructor (
-    private readonly query: TransactionQueryRepository
+    private readonly query: TransactionQueryRepository,
   ) {}
 
   public async deposit(depositInput: TransactionDTO) {

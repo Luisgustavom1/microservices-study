@@ -3,6 +3,7 @@
    "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "@shared/*": ["./src/shared/*"],
       "@contracts/*": ["./src/shared/contracts/*"],
       "@event-bus/*": ["./src/shared/event-bus/*"],
       "@query.handler/*": ["./src/query.handler/*"],

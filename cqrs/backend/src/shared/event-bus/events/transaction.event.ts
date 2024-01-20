@@ -26,6 +26,7 @@ export class TransactionEvent<S extends Account> extends BaseEvent<TransactionEv
         throw new Error('Invalid transaction type')
     }
 
+    state.updated_at = new Date();
     return state
   }
 
@@ -44,7 +45,7 @@ export class TransactionEventData {
   constructor(
     public type: TransactionType,
     public accountId: number,
-    public amount: number, 
+    public amount: string, 
     public currency: string, 
     public wallet: string,
   ) {}

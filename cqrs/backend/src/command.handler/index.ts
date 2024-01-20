@@ -3,6 +3,8 @@ import { TransactionEvent } from "@event-bus/events/transaction.event";
 import { TransactionReplicateEvent } from "@event-bus/events/transaction.replicate.event";
 import { CommandListener } from "./command.listener";
 import { TransactionCommand } from "./repository/transaction.command";
+import { Reducer } from "@shared/reducer";
+import { AccountCommand } from "./repository/account.command";
 
 async function init() {
   await EventBusConnection.connect({
@@ -15,7 +17,9 @@ async function init() {
   const eventToListen = new TransactionEvent()
   const listener = new CommandListener(
     new TransactionCommand(), 
-    new TransactionReplicateEvent()
+    new TransactionReplicateEvent(),
+    new AccountCommand(),
+    new Reducer()
   );
 
   eventToListen.subscribe(listener)

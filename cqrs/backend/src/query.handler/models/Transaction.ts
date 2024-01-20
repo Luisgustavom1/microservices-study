@@ -1,4 +1,4 @@
-import { TransactionType } from "@command.handler/models/Transaction";
+import { TransactionType } from "@command.handler/models/Transaction"; // TODO: not share models between command and query
 
 export class Transaction {
   constructor(

@@ -30,7 +30,7 @@ export class TransactionDomain {
         type: TransactionType.deposit,
         accountId: accountToDeposit.id,
         currency: depositInput.currency, 
-        amount: depositInput.amount, 
+        amount: String(depositInput.amount), 
         wallet: accountToDeposit.wallet,
       })
       this.transactionBus.publish()
@@ -66,7 +66,7 @@ export class TransactionDomain {
         type: TransactionType.withdrawal,
         accountId: accountToDeposit.id,
         currency: withdrawInput.currency, 
-        amount: withdrawInput.amount, 
+        amount: String(withdrawInput.amount), 
         wallet: accountToDeposit.wallet,
       })
       this.transactionBus.publish()
@@ -82,7 +82,6 @@ export class TransactionDomain {
   public async list(wallet: string) {
     try {
       const transactions = await this.query.list({ wallet });
-      
       return { success: true, count: transactions?.length, data: transactions }
     } catch (error) {
       console.log("[ERROR]", error);

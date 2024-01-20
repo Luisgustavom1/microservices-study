@@ -5,7 +5,7 @@ export class Transaction {
     public type: TransactionType,
     public currency: string,
     public amount: string,
-    public created_at: string,
+    public created_at: Date,
   ) {}
 }
 

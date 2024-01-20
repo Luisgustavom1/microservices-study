@@ -6,13 +6,13 @@ export class Account {
     public type: AccountType,
     public wallet: string,
     public balance: string,
-    public opened_at: string,
-    public updated_at: string,
-    public transactions: Array<Transaction>, // events from event sourcing
+    public opened_at: Date,
+    public updated_at: Date,
+    public transactions?: Array<Omit<Transaction, "accountId">>, // events from event sourcing
   ) {}
 }
 
-enum AccountType {
+export enum AccountType {
   checking = 'checking',
   savings = 'savings',
   investment = 'investment',

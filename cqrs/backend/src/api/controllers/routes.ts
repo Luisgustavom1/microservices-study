@@ -1,5 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { TransactionController, TransactionDTO } from "./transaction";
+import { AccountController } from "./account";
 
 export const initRoutes = (server: FastifyInstance) => {
   server.post<{ Body: TransactionDTO }>('/deposit', async (request, reply) => {
@@ -12,5 +13,9 @@ export const initRoutes = (server: FastifyInstance) => {
   
   server.get<{ Params: { wallet: string } }>('/transaction/:wallet', async (request, reply) => {
     return TransactionController.list(request, reply);
+  })
+
+  server.get<{ Params: { wallet: string } }>('/account/:wallet', async (request, reply) => {
+    return AccountController.getByWallet(request, reply);
   })
 }

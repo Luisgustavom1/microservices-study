@@ -1,9 +1,9 @@
 export class Account {
   constructor(
-    public id: number,
+    public accountId: number,
     public wallet: string,
     public balance: string,
-    public opened_at: Date,
-    public updated_at: Date,
+    public opened_at: string,
+    public updated_at: string,
   ) {}
 }

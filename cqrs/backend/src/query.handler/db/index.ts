@@ -27,5 +27,5 @@ export async function connectToReadDB() {
   collections.transaction = transactionCollection;
   collections.account = accountCollection;
      
-  console.log(`Successfully connected to database: ${db.databaseName} and collection: ${transactionCollection.collectionName}`);
+  console.log(`Successfully connected to database: ${db.databaseName} and collection: ${transactionCollection.collectionName}, ${accountCollection.collectionName}`);
 }

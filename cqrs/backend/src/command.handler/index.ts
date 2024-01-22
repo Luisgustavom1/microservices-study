@@ -1,6 +1,6 @@
 import { EventBusConnection } from "@event-bus/connection";
 import { TransactionEvent } from "@event-bus/events/transaction.event";
-import { TransactionReplicateEvent } from "@event-bus/events/transaction.replicate.event";
+import { TransactionReplicateEvent } from "@shared/event-bus/events/query.replicate.event";
 import { CommandListener } from "./command.listener";
 import { TransactionCommand } from "./repository/transaction.command";
 import { Reducer } from "@shared/reducer";

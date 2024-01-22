@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { AccountDomain } from "../domain/account";
-import { AccountQuery } from "@query.handler/repository/account";
+import { AccountQuery } from "@query.handler/repository/account.query";
 
 export class AccountController {
   private static readonly accountDomain = new AccountDomain(new AccountQuery());

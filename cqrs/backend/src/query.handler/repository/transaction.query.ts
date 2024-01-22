@@ -1,7 +1,7 @@
 import { OptionalUnlessRequiredId } from "mongodb";
 import { Transaction } from "@query.handler/models/Transaction";
 import { collections } from "../db";
-import { TransactionQueryRepository } from ".";
+import { TransactionQueryRepository } from "./transaction.query.repository";
 
 export class TransactionQuery implements TransactionQueryRepository {
   private readonly db = collections.transaction;

@@ -1,6 +1,6 @@
 import { Listener } from "@event-bus/Listener";
 import { TransactionReplicateEventData } from "@event-bus/events/transaction.replicate.event";
-import { TransactionQueryRepository } from "@query.handler/repository";
+import { TransactionQueryRepository } from "@query.handler/repository/transaction.query.repository";
 
 export class QueryListener implements Listener {
   constructor(

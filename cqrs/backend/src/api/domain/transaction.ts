@@ -3,7 +3,7 @@ import { TransactionDTO } from "../controllers/transaction";
 import { db } from "@command.handler/db";
 import { account } from "@command.handler/db/schema/account";
 import { TransactionEvent } from "@event-bus/events/transaction.event";
-import { TransactionQueryRepository } from "@query.handler/repository";
+import { TransactionQueryRepository } from "@query.handler/repository/transaction.query.repository";
 import { TransactionType } from "@command.handler/models/Transaction";
 
 export class TransactionDomain {

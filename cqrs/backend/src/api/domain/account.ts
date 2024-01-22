@@ -1,14 +1,13 @@
-import { AccountCommandRepository } from "@command.handler/repository/account.command.repository";
+import { AccountQueryRepository } from "@query.handler/repository/account.query.repository";
 
 export class AccountDomain {
   constructor (
-    private readonly accountRepo: AccountCommandRepository,
+    private readonly accountRepo: AccountQueryRepository,
   ) {}
 
   public async getByWallet(wallet: string) {
     try {
-      // TODO: get by query not command
-      const account = await this.accountRepo.getByWallet(wallet);
+      const account = await this.accountRepo.getByWallet({ wallet });
       return { success: true, data: account }
     } catch (error) {
       console.log("[ERROR]", error);

@@ -1,9 +1,9 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { AccountCommand } from "@command.handler/repository/account.command";
 import { AccountDomain } from "../domain/account";
+import { AccountQuery } from "@query.handler/repository/account";
 
 export class AccountController {
-  private static readonly accountDomain = new AccountDomain(new AccountCommand());
+  private static readonly accountDomain = new AccountDomain(new AccountQuery());
 
   public static async getByWallet(req: FastifyRequest<{ Params: { wallet: string } }>, reply: FastifyReply) {
     const input = req.params.wallet

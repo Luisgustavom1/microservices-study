@@ -1,8 +1,9 @@
 import { EventBusConnection } from "@event-bus/connection";
-import { TransactionReplicateEvent } from "@event-bus/events/transaction.replicate.event";
+import { TransactionReplicateEvent } from "@shared/event-bus/events/query.replicate.event";
 import { connectToReadDB } from "./db";
 import { QueryListener } from "./query.listener";
 import { TransactionQuery } from "./repository/transaction.query";
+import { AccountQuery } from "./repository/account.query";
 
 async function init() {
   await connectToReadDB();
@@ -15,7 +16,10 @@ async function init() {
   })
 
   const eventToListen = new TransactionReplicateEvent()
-  const listener = new QueryListener(new TransactionQuery());
+  const listener = new QueryListener(
+    new TransactionQuery(),
+    new AccountQuery(),
+  );
 
   eventToListen.subscribe(listener)
 }

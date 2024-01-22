@@ -4,10 +4,8 @@ import { collections } from "../db";
 import { TransactionQueryRepository } from "./transaction.query.repository";
 
 export class TransactionQuery implements TransactionQueryRepository {
-  private readonly db = collections.transaction;
-
   public async save(values: OptionalUnlessRequiredId<Transaction>) {
-    return this.db?.insertOne(values)
+    return collections.transaction?.insertOne(values)
   }
 
   public async list(where: { wallet: string }) {

@@ -1,5 +1,5 @@
 import { BaseEvent } from "@event-bus/events/base.event";
-import { TransactionReplicateEventData } from "@event-bus/events/transaction.replicate.event";
+import { QueryReplicateEventData } from "@shared/event-bus/events/query.replicate.event";
 import { TransactionEvent, TransactionEventData } from "@event-bus/events/transaction.event";
 import { Listener } from "@event-bus/Listener";
 import { TransactionCommandRepository } from "@command.handler/repository/transaction.command.repository";
@@ -12,7 +12,7 @@ import { account } from "./db/schema/account";
 export class CommandListener implements Listener {
   constructor (
     private readonly service: TransactionCommandRepository,
-    private readonly eventBus: BaseEvent<TransactionReplicateEventData>,
+    private readonly eventBus: BaseEvent<QueryReplicateEventData>,
     private readonly accountRepo: AccountCommandRepository,
     private readonly reducer: Reducer<Account>
   ) {}
@@ -30,29 +30,39 @@ export class CommandListener implements Listener {
     }) || [];
 
     if (!transactionCreated) throw new Error('Transaction not created')
-    
+
+    const accountUpdated = await this.updateAccount(values.accountId, values.wallet)
+
+    const newTransaction = {
+      amount: amountParsed,
+      wallet: values.wallet,
+      type: values.type,
+      currency: values.currency,
+      transactionId: transactionCreated?.insertId,
+      created_at: createdAt.getTime(),
+    }
+
+    const newAccount = {
+      accountId: values.accountId,
+      wallet: values.wallet,
+      balance: accountUpdated.balance,
+      opened_at: accountUpdated.opened_at.toISOString(),
+      updated_at: accountUpdated.updated_at.toISOString(),
+    }
+
     // TODO: use transaction to ensure consistency
-    await Promise.all([
-      this.updateAccount(values.accountId, values.wallet),
-      this.dispatchNewEvent({
-        amount: amountParsed,
-        wallet: values.wallet,
-        type: values.type,
-        currency: values.currency,
-        transactionId: transactionCreated?.insertId,
-        created_at: createdAt.getTime(),
-      })
-    ])
+    await this.dispatchNewEvent({ transaction: newTransaction, account: newAccount })
   }
 
   private async updateAccount(accountId: number, wallet: string) {
     const newAccount = await this.calculateNewAccountState(accountId, wallet)
-    return this.accountRepo.update({
+    await this.accountRepo.update({
         balance: newAccount.balance,
         updated_at: new Date(),
       }, 
       eq(account.id, accountId)
     )
+    return newAccount;
   }
 
   private async calculateNewAccountState(accountId: number, wallet: string): Promise<Account> {
@@ -87,7 +97,7 @@ export class CommandListener implements Listener {
     return accountReduced
   }
 
-  private async dispatchNewEvent(message: TransactionReplicateEventData) {
+  private async dispatchNewEvent(message: QueryReplicateEventData) {
     this.eventBus.prepareMessage(message)
     await this.eventBus.publish()
   }

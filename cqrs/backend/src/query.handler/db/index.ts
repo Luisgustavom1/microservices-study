@@ -1,7 +1,13 @@
 import { MongoClient, Db, Collection } from 'mongodb';
 import { Transaction } from '../models/Transaction';
+import { Account } from '@query.handler/models/Account';
 
-export const collections: { transaction?: Collection<Transaction> } = {}
+interface Collections { 
+  transaction?: Collection<Transaction>
+  account?: Collection<Account>
+} 
+
+export const collections: Collections = {}
 
 export async function connectToReadDB() {
   const MONGO_HOST = process.env.READ_DATABASE_HOST;
@@ -16,8 +22,10 @@ export async function connectToReadDB() {
   const db: Db = client.db(process.env.READ_DATABASE_NAME);
  
   const transactionCollection: Collection<Transaction> = db.collection(Transaction.name);
+  const accountCollection: Collection<Account> = db.collection(Account.name);
 
   collections.transaction = transactionCollection;
+  collections.account = accountCollection;
      
   console.log(`Successfully connected to database: ${db.databaseName} and collection: ${transactionCollection.collectionName}`);
 }

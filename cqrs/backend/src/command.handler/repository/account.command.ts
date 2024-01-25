@@ -13,6 +13,11 @@ export class AccountCommand implements AccountCommandRepository {
     return this.db.update(account).set(set).where(where)
   }
 
+  async list(): Promise<Account[]> {
+    const rows = await this.db.select().from(account)
+    return rows
+  }
+
   async getByWallet(wallet: string): Promise<Account | undefined> {
     const [row] = await this.db.select({ account }).from(account).where(
       eq(account.wallet, wallet)

@@ -15,6 +15,10 @@ export const initRoutes = (server: FastifyInstance) => {
     return TransactionController.list(request, reply);
   })
 
+  server.get('/account', async (request, reply) => {
+    return AccountController.list(request, reply);
+  })
+
   server.get<{ Params: { wallet: string } }>('/account/:wallet', async (request, reply) => {
     return AccountController.getByWallet(request, reply);
   })

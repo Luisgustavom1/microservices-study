@@ -8,4 +8,5 @@ export interface AccountCommandRepository {
   getById(accountId: number): Promise<Account | undefined>;
   getByWallet(wallet: string): Promise<Account | undefined>;
   update(set: MySqlUpdateSetSource<typeof account>, where: SQL): Promise<MySqlRawQueryResult | undefined>;
+  list(): Promise<Account[]>;
 }

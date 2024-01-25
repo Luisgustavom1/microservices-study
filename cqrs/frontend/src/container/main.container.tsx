@@ -11,5 +11,5 @@ export const MainContainer = ({ Aside, Content }: MainContainerProps) => {
       <Aside />
       <Content />
     </div>
-  )
-}
+  );
+};

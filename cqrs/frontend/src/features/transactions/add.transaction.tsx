@@ -1,4 +1,4 @@
-import { Transaction, TransactionType } from ".";
+import { Transaction, TransactionType } from "./model";
 
 interface AddTransactionProps {
   addTransaction: (transaction: Transaction) => void;
@@ -6,20 +6,25 @@ interface AddTransactionProps {
 
 export const AddTransaction = ({ addTransaction }: AddTransactionProps) => {
   return (
-    <button onClick={() => {
-      const randTransaction: Transaction = {
-        _id: Math.random().toString(),
-        transactionId: Math.random(),
-        type: Math.random() > 0.5 ? TransactionType.deposit : TransactionType.withdrawal,
-        wallet: Math.random().toString(),
-        currency: Math.random().toString(),
-        amount: Math.random().toString(),
-        created_at: Math.random(),
-      }
+    <button
+      onClick={() => {
+        const randTransaction: Transaction = {
+          _id: Math.random().toString(),
+          transactionId: Math.random(),
+          type:
+            Math.random() > 0.5
+              ? TransactionType.deposit
+              : TransactionType.withdrawal,
+          wallet: Math.random().toString(),
+          currency: Math.random().toString(),
+          amount: Math.random().toString(),
+          created_at: Math.random(),
+        };
 
-      addTransaction(randTransaction)
-    }}>
+        addTransaction(randTransaction);
+      }}
+    >
       add transaction
     </button>
-  )
-}
+  );
+};

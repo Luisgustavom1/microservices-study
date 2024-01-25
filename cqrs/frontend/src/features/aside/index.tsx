@@ -1,10 +1,11 @@
 import { FaRegularMoneyBill1, FaSolidList } from "solid-icons/fa";
-import { FiArrowDownCircle, FiArrowUpCircle } from "solid-icons/fi";
+import { VsAccount } from "solid-icons/vs";
 import { Item } from "./item";
+import { AccountSection } from "./account.section";
 
 export const Aside = () => {
   return (
-    <aside class="h-screen min-w-60 border-r border-r-gray-200 bg-gray-light">
+    <aside class="relative h-screen min-w-60 border-r border-r-gray-200 bg-gray-light">
       <header class="mb-4 flex items-center gap-2 p-6">
         <FaRegularMoneyBill1 size={20} />
         <h2 class="font-bold">Bank Dashboard</h2>
@@ -17,6 +18,8 @@ export const Aside = () => {
           href="/"
         />
       </ul>
+
+      <AccountSection />
     </aside>
   );
 };

@@ -2,12 +2,9 @@ import { createResource, createSignal } from "solid-js";
 import { TransactionList } from "./List/list";
 import { getTransactions } from "../../services/transaction";
 import { ImSearch } from "solid-icons/im";
+import { Header } from "../../components/header";
 
-interface TransactionsProps {
-  title: string;
-}
-
-export const Transactions = (props: TransactionsProps) => {
+export const Transactions = () => {
   const [wallet, setWallet] = createSignal<string>();
   const [transactions] = createResource(
     () => [wallet()] as const,
@@ -23,7 +20,7 @@ export const Transactions = (props: TransactionsProps) => {
   return (
     <div class="w-full">
       <header class="mb-4 flex w-full items-center gap-2 border-b border-b-gray-200 bg-gray-light p-6">
-        <h1 class="font-bold">{props.title}</h1>
+        <h1 class="font-bold">Transactions</h1>
       </header>
 
       <main class="p-6">

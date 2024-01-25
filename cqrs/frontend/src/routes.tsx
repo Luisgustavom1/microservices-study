@@ -9,10 +9,7 @@ export const Routes = () => {
       Aside={() => <Aside />}
       Content={() => (
         <Router>
-          <Route
-            path="/"
-            component={() => <Transactions title="Transactions" />}
-          />
+          <Route path="/" component={Transactions} />
         </Router>
       )}
     />

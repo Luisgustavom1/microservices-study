@@ -1,4 +1,4 @@
-import { JSX } from "solid-js/jsx-runtime"
+import { JSX } from "solid-js/jsx-runtime";
 
 interface ItemProps {
   Icon: JSX.Element;
@@ -9,10 +9,13 @@ interface ItemProps {
 export const Item = (props: ItemProps) => {
   return (
     <li>
-      <a class='flex items-center gap-3 p-2 rounded-md hover:transition-all hover:bg-slate-200 hover:bg-opacity-40 text-gray-600' href={props.href}>
+      <a
+        class="flex items-center gap-3 rounded-md px-2 py-4 text-gray-600 hover:bg-slate-200 hover:bg-opacity-40 hover:transition-all"
+        href={props.href}
+      >
         {props.Icon}
         <p class="text-sm font-semibold">{props.text}</p>
       </a>
     </li>
-  )
-}
+  );
+};

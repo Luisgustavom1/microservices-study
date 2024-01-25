@@ -19,9 +19,7 @@ export const Transactions = () => {
 
   return (
     <div class="w-full">
-      <header class="mb-4 flex w-full items-center gap-2 border-b border-b-gray-200 bg-gray-light p-6">
-        <h1 class="font-bold">Transactions</h1>
-      </header>
+      <Header title="Transactions" />
 
       <main class="p-6">
         <form

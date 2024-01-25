@@ -1,5 +1,5 @@
 import { FaRegularMoneyBill1, FaSolidList } from "solid-icons/fa";
-import { VsAccount } from "solid-icons/vs";
+import { VsDiffAdded } from "solid-icons/vs";
 import { Item } from "./item";
 import { AccountSection } from "./account.section";
 
@@ -15,7 +15,12 @@ export const Aside = () => {
         <Item
           Icon={<FaSolidList size={20} />}
           text="All transactions"
-          href="/"
+          href="/transactions"
+        />
+        <Item
+          Icon={<VsDiffAdded size={20} />}
+          text="Add transaction"
+          href="/transactions/add"
         />
       </ul>
 

@@ -1,30 +1,15 @@
-import { Transaction, TransactionType } from "./model";
+import { Header } from "../../components/header";
 
-interface AddTransactionProps {
-  addTransaction: (transaction: Transaction) => void;
-}
-
-export const AddTransaction = ({ addTransaction }: AddTransactionProps) => {
+export const AddTransaction = () => {
   return (
-    <button
-      onClick={() => {
-        const randTransaction: Transaction = {
-          _id: Math.random().toString(),
-          transactionId: Math.random(),
-          type:
-            Math.random() > 0.5
-              ? TransactionType.deposit
-              : TransactionType.withdrawal,
-          wallet: Math.random().toString(),
-          currency: Math.random().toString(),
-          amount: Math.random().toString(),
-          created_at: Math.random(),
-        };
+    <div class="w-full">
+      <Header title="Add transaction" />
 
-        addTransaction(randTransaction);
-      }}
-    >
-      add transaction
-    </button>
+      <main class="p-6">
+        <form class="flex max-h-[75vh] flex-col overflow-hidden rounded-md border border-gray-200 p-4">
+          <h2 class="mb-4 text-lg font-semibold">New Transaction</h2>
+        </form>
+      </main>
+    </div>
   );
 };

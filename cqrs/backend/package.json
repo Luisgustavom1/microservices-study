@@ -8,6 +8,7 @@
 		"db:generate": "drizzle-kit generate:mysql"
 	},
 	"dependencies": {
+		"@fastify/cors": "^8.5.0",
 		"amqplib": "^0.10.3",
 		"drizzle-orm": "^0.29.2",
 		"fastify": "^4.25.2",

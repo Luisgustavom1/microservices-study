@@ -2,6 +2,7 @@ import fastify from 'fastify'
 import { connectToReadDB } from '@query.handler/db';
 import { EventBusConnection } from '@event-bus/connection';
 import { initRoutes } from './controllers/routes';
+import cors from '@fastify/cors'
 
 const server = fastify()
 
@@ -16,6 +17,8 @@ async function init() {
     username: process.env.EVENT_BUS_USERNAME,
     password: process.env.EVENT_BUS_PASSWORD,
   })
+
+  await server.register(cors)
 
   server.listen({ port: 8080, host: '0.0.0.0' }, (err, address) => {
     if (err) {

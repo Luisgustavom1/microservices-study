@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import { Transaction, TransactionType } from "../model";
 
 function formatDate(timestamp: number) {
@@ -24,7 +25,16 @@ export const ListItem = (item: Transaction) => {
       <div class="w-1/4">{formatDate(item.created_at)}</div>
       <strong class="w-1/4">{item.currency}</strong>
       <p class="w-1/4">{formatAmount(item.amount)}</p>
-      <p class="w-1/4">{transactionTypeMapToLabel[item.type]} </p>
+      <p
+        class={clsx(
+          "w-1/4",
+          item.type === TransactionType.deposit && "text-green-500",
+          item.type === TransactionType.withdrawal && "text-red-500",
+          item.type === TransactionType.transfer && "text-yellow-500",
+        )}
+      >
+        {transactionTypeMapToLabel[item.type]}{" "}
+      </p>
     </section>
   );
 };

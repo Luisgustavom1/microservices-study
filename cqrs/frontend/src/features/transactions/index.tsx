@@ -1,36 +1,17 @@
-import { createSignal } from "solid-js";
+import { createResource, createSignal } from "solid-js";
 import { TransactionList } from "./List/list";
-import { Transaction, TransactionType } from "./model";
+import { getTransactions } from "../../services/transaction";
 
 interface TransactionsProps {
   title: string;
 }
 
 export const Transactions = (props: TransactionsProps) => {
-  const [transactions, setTransactions] = createSignal<Array<Transaction>>([
-    {
-      _id: "1",
-      transactionId: 1,
-      type: TransactionType.deposit,
-      wallet: "42342343242",
-      currency: "USD",
-      amount: "100",
-      created_at: new Date().getTime(),
-    },
-    {
-      _id: "2",
-      transactionId: 2,
-      type: TransactionType.withdrawal,
-      wallet: "42342343242",
-      currency: "R$",
-      amount: "200",
-      created_at: new Date().getTime(),
-    },
-  ]);
-
-  const addTransaction = (transaction: Transaction) => {
-    setTransactions((t) => [...t, transaction]);
-  };
+  const [wallet, setWallet] = createSignal<string>();
+  const [transactions] = createResource(
+    () => [wallet()] as const,
+    ([acc]) => getTransactions(acc),
+  );
 
   return (
     <div class="w-full">
@@ -39,7 +20,14 @@ export const Transactions = (props: TransactionsProps) => {
       </header>
 
       <main class="p-6">
-        <TransactionList transactions={transactions()} />
+        <input
+          placeholder="Search by wallet"
+          class="mb-4 rounded-md border border-gray-200 p-2"
+          onChange={(ev) => {
+            setWallet(ev.currentTarget.value);
+          }}
+        />
+        <TransactionList transactions={transactions() ?? []} />
       </main>
     </div>
   );

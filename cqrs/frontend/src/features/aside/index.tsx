@@ -16,16 +16,6 @@ export const Aside = () => {
           text="All transactions"
           href="/"
         />
-        <Item
-          Icon={<FiArrowDownCircle size={20} />}
-          text="Deposit"
-          href="/deposit"
-        />
-        <Item
-          Icon={<FiArrowUpCircle size={20} />}
-          text="Withdrawals"
-          href="/withdrawals"
-        />
       </ul>
     </aside>
   );

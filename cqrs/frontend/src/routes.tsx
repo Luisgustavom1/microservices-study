@@ -5,13 +5,16 @@ import { Transactions } from "./features/transactions";
 
 export const Routes = () => {
   return (
-    <MainContainer 
+    <MainContainer
       Aside={() => <Aside />}
       Content={() => (
         <Router>
-          <Route path="/deposit" component={() => <Transactions title="Depositos" />} />
+          <Route
+            path="/"
+            component={() => <Transactions title="Transactions" />}
+          />
         </Router>
       )}
     />
-  )
-}
+  );
+};

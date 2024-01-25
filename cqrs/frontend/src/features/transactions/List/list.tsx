@@ -1,4 +1,4 @@
-import { For } from "solid-js";
+import { For, Show } from "solid-js";
 import { HeaderItem } from "./header.item";
 import { ListItem } from "./list.item";
 import { Transaction } from "../model";
@@ -9,8 +9,8 @@ interface TransactionListProps {
 
 export const TransactionList = (props: TransactionListProps) => {
   return (
-    <div class="rounded-md border border-gray-200 p-4">
-      <h2 class="mb-4 text-lg font-semibold">Transactions</h2>
+    <div class="flex max-h-[75vh] flex-col overflow-hidden rounded-md border border-gray-200 p-4">
+      <h2 class="mb-4 text-lg font-semibold">My Transactions</h2>
 
       <header class="flex justify-between px-2 py-4">
         <HeaderItem>Date</HeaderItem>
@@ -19,7 +19,22 @@ export const TransactionList = (props: TransactionListProps) => {
         <HeaderItem>Type</HeaderItem>
       </header>
 
-      <For each={props.transactions}>{(item) => <ListItem {...item} />}</For>
+      <div class="flex-1 overflow-y-auto">
+        <Show
+          when={props.transactions.length > 0}
+          fallback={
+            <div class="my-4 flex justify-center">
+              <p class="text-lg font-semibold text-gray-500">
+                No Transactions found
+              </p>
+            </div>
+          }
+        >
+          <For each={props.transactions}>
+            {(item) => <ListItem {...item} />}
+          </For>
+        </Show>
+      </div>
     </div>
   );
 };

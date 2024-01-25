@@ -1,6 +1,7 @@
 import { createResource, createSignal } from "solid-js";
 import { TransactionList } from "./List/list";
 import { getTransactions } from "../../services/transaction";
+import { ImSearch } from "solid-icons/im";
 
 interface TransactionsProps {
   title: string;
@@ -13,6 +14,12 @@ export const Transactions = (props: TransactionsProps) => {
     ([acc]) => getTransactions(acc),
   );
 
+  const handleSubmit = (ev: Event) => {
+    ev.preventDefault();
+    const formData = new FormData(ev.target as HTMLFormElement);
+    setWallet(formData.get("wallet") as string);
+  };
+
   return (
     <div class="w-full">
       <header class="mb-4 flex w-full items-center gap-2 border-b border-b-gray-200 bg-gray-light p-6">
@@ -20,13 +27,23 @@ export const Transactions = (props: TransactionsProps) => {
       </header>
 
       <main class="p-6">
-        <input
-          placeholder="Search by wallet"
-          class="mb-4 rounded-md border border-gray-200 p-2"
-          onChange={(ev) => {
-            setWallet(ev.currentTarget.value);
-          }}
-        />
+        <form
+          class="mb-4 flex h-fit items-center gap-1"
+          onSubmit={handleSubmit}
+        >
+          <input
+            name="wallet"
+            placeholder="Search by wallet"
+            class="rounded-md border border-gray-200 p-2"
+            onChange={(ev) => {
+              setWallet(ev.currentTarget.value);
+            }}
+          />
+          <button class="rounded-full p-2 hover:bg-gray-200 hover:transition-all">
+            <ImSearch size={18} class="text-gray-500" />
+          </button>
+        </form>
+
         <TransactionList transactions={transactions() ?? []} />
       </main>
     </div>

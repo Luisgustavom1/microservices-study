@@ -10,7 +10,13 @@ interface TransactionListProps {
 export const TransactionList = (props: TransactionListProps) => {
   return (
     <div class="flex max-h-[75vh] flex-col overflow-hidden rounded-md border border-gray-200 p-4">
-      <h2 class="mb-4 text-lg font-semibold">My Transactions</h2>
+      <span class="flex items-center justify-between">
+        <h2 class="mb-4 text-lg font-semibold">My Transactions</h2>
+
+        <p>
+          Transactions: <strong>{props.transactions.length}</strong>
+        </p>
+      </span>
 
       <header class="flex justify-between px-2 py-4">
         <HeaderItem>Date</HeaderItem>

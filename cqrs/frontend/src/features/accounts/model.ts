@@ -1,3 +1,9 @@
+interface ListAccounts {
+  id: string;
+  type: string;
+  wallet: string;
+}
+
 interface Account {
   _id: string;
   wallet: string;

@@ -3,17 +3,24 @@ import { MainContainer } from "./container/main.container";
 import { Aside } from "./features/aside";
 import { Transactions } from "./features/transactions";
 import { AddTransaction } from "./features/transactions/add.transaction";
+import { Accounts } from "./features/accounts";
 
 export const Routes = () => {
   return (
-    <MainContainer
-      Aside={() => <Aside />}
-      Content={() => (
-        <Router>
-          <Route path="/transactions" component={Transactions} />
-          <Route path="/transactions/add" component={AddTransaction} />
-        </Router>
-      )}
-    />
+    <Router>
+      <Route path="/" component={Accounts} />
+      <Route
+        path="/transactions"
+        component={(props) => (
+          <MainContainer
+            Aside={() => <Aside />}
+            Content={() => props.children}
+          />
+        )}
+      >
+        <Route path="/" component={Transactions} />
+        <Route path="/add" component={AddTransaction} />
+      </Route>
+    </Router>
   );
 };

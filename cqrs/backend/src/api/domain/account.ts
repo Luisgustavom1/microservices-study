@@ -20,10 +20,18 @@ export class AccountDomain {
   public async list() {
     try {
       const accounts = await this.accountCommand.list();
-      return { success: true, data: accounts }
+      return { success: true, data: accounts.map((acc) => new ListAccountsDTO(acc.id, acc.type, acc.wallet)) }
     } catch (error) {
       console.log("[ERROR]", error);
       return { success: false, error: "Tente novamente mais tarde" };
     }
   }
+}
+
+class ListAccountsDTO {
+  constructor (
+    public readonly id: number,
+    public readonly type: string,
+    public readonly wallet: string,
+  ) {}
 }

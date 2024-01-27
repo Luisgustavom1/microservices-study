@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import { Transaction, TransactionType } from "../model";
+import { transactionTypeMapToLabel } from "../utils";
 
 function formatDate(timestamp: number) {
   const date = new Date(timestamp);
@@ -12,12 +13,6 @@ function formatAmount(amount: string) {
     maximumFractionDigits: 2,
   });
 }
-
-const transactionTypeMapToLabel = {
-  [TransactionType.deposit]: "Deposit",
-  [TransactionType.withdrawal]: "Withdrawal",
-  [TransactionType.transfer]: "Transfer",
-};
 
 export const ListItem = (item: Transaction) => {
   return (

@@ -1,5 +1,5 @@
 import { Router, Route } from "@solidjs/router";
-import { MainContainer } from "./container/main.container";
+import { PrivateContainer } from "./container/private.container";
 import { Aside } from "./features/aside";
 import { Transactions } from "./features/transactions";
 import { AddTransaction } from "./features/transactions/add.transaction";
@@ -12,7 +12,7 @@ export const Routes = () => {
       <Route
         path="/transactions"
         component={(props) => (
-          <MainContainer
+          <PrivateContainer
             Aside={() => <Aside />}
             Content={() => props.children}
           />

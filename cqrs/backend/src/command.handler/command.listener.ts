@@ -8,6 +8,7 @@ import { Account } from "./models/Account";
 import { AccountCommandRepository } from "./repository/account.command.repository";
 import { eq } from "drizzle-orm";
 import { account } from "./db/schema/account";
+import { db } from "./db";
 
 export class CommandListener implements Listener {
   constructor (
@@ -21,24 +22,29 @@ export class CommandListener implements Listener {
     const amountParsed = String(values.amount);
     const createdAt = new Date();
 
-    const [transactionCreated] = await this.service.save({
-      accountId: values.accountId,
-      currency: values.currency,
-      amount: amountParsed,
-      type: values.type,
-      created_at: createdAt,
-    }) || [];
+    const { account: accountUpdated, transaction: transactionCreated } = await db.transaction(async (tx) => {
+      const [transactionCreated] = await this.service.save({
+        accountId: values.accountId,
+        currency: values.currency,
+        amount: amountParsed,
+        type: values.type,
+        created_at: createdAt,
+      }) || [];
 
-    if (!transactionCreated) throw new Error('Transaction not created')
+      if (!transactionCreated) return await tx.rollback();
 
-    const accountUpdated = await this.updateAccount(values.accountId, values.wallet)
+      return {
+        account: await this.updateAccount(values.accountId, values.wallet),
+        transaction: transactionCreated,
+      }
+    })
 
     const newTransaction = {
       amount: amountParsed,
       wallet: values.wallet,
       type: values.type,
       currency: values.currency,
-      transactionId: transactionCreated?.insertId,
+      transactionId: transactionCreated.insertId,
       created_at: createdAt.getTime(),
     }
 

@@ -1,0 +1,13 @@
+version: "3.5"
+services:
+  nats:
+    image: nats
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+      - "6222:6222"
+    networks: ["nats"]
+
+networks:
+  nats:
+    name: nats

@@ -7,6 +7,7 @@ services:
       - "8222:8222"
       - "6222:6222"
     networks: ["nats"]
+    command: ["-js"]
 
 networks:
   nats:

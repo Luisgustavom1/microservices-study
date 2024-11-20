@@ -24,7 +24,22 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	for i := 1; i <= 1000; i++ {
-		js.Publish(ctx, fmt.Sprintf("trades.%s", i), []byte(fmt.Sprintf("hi i'm a message %d", i)))
+	tradesOrder := []string{
+		"12654A87FR4,BUY,AAPL,1254",
+		"87R54E3068U,BUY,AAPL,3122",
+		"6R4NB7609JJ,BUY,AAPL,5433",
+		"2WE35HF6DHF,BUY,AAPL,8756 SHARES",
+		"764980974R2,BUY,AAPL,1211",
+		"764980974R2,BUY,AAPL",
+	}
+
+	for i := 0; i < 6; i++ {
+		js.PublishMsg(ctx, &nats.Msg{
+			Subject: fmt.Sprintf("trade.%s"),
+			Data:    []byte(tradesOrder[i%len(tradesOrder)]),
+			Header: nats.Header{
+				"trade-id": []string{string(i)},
+			},
+		})
 	}
 }

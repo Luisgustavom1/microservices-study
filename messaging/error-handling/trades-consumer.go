@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"math/rand"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -29,39 +29,45 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	stream, err := js.CreateOrUpdateStream(ctx, jetstream.StreamConfig{
-		Name:     "trades-consumer",
-		Subjects: []string{"trades.*"},
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
+	stream := RetrieveStream(js, StreamConfig{
+		Name:     "trade-consumer",
+		Subjects: []string{"trade.*"},
+	}, ctx)
 
-	cons, err := stream.CreateOrUpdateConsumer(ctx, jetstream.ConsumerConfig{
-		Durable: "processor",
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	cc, err := cons.Consume(func(msg jetstream.Msg) {
-		msg.Ack()
-		fmt.Println("received msg on", msg.Subject(), string(msg.Data()))
-
-		n := rand.Intn(1000)
-		if n%2 == 0 {
-			js.Publish(ctx, fmt.Sprintf("trades.error.%d", n), []byte(fmt.Sprintf("error processing trade %s", msg.Subject())))
-		}
-
-	}, jetstream.ConsumeErrHandler(func(consumeCtx jetstream.ConsumeContext, err error) {
-		fmt.Println(err)
-	}))
-	if err != nil {
-		log.Fatal(err)
-	}
+	cc := BuildConsumer(stream, ConsumerConfig{
+		Handler: processTrade(js, ctx),
+		HandlerErr: func(consumeCtx jetstream.ConsumeContext, err error) {
+			fmt.Println(err)
+		},
+	}, ctx)
 	defer cc.Drain()
 
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 	<-sig
+}
+
+func processTrade(js jetstream.JetStream, ctx context.Context) func(msg jetstream.Msg) {
+	return func(msg jetstream.Msg) {
+		order := string(msg.Data())
+		invalidTrade := len(strings.Split(order, " ")) > 1 || len(strings.Split(order, ",")) != 4
+
+		if invalidTrade {
+			tradeId := msg.Headers().Get("trade-id")
+
+			fmt.Println("Error placing trade", order)
+			fmt.Println("Sending to trade error processor  <-- delegate the error fixing and move on")
+			js.PublishMsg(ctx, &nats.Msg{
+				Subject: fmt.Sprintf("%s.error", msg.Subject()),
+				Data:    msg.Data(),
+				Header: nats.Header{
+					"trade-id": []string{tradeId},
+				},
+			})
+		} else {
+			fmt.Println("Trade Placed", order)
+		}
+
+		msg.Ack()
+	}
 }

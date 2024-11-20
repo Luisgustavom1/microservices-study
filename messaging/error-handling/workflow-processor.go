@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -28,33 +29,49 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	stream, err := js.CreateOrUpdateStream(ctx, jetstream.StreamConfig{
-		Name:     "trades-error-consumer",
-		Subjects: []string{"trades.error.>"},
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
+	stream := RetrieveStream(js, StreamConfig{
+		Name:     "trade-error-consumer",
+		Subjects: []string{"trade.*.error"},
+	}, ctx)
 
-	cons, err := stream.CreateOrUpdateConsumer(ctx, jetstream.ConsumerConfig{
-		Durable: "processor",
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	cc, err := cons.Consume(func(msg jetstream.Msg) {
-		msg.Ack()
-		fmt.Println("received msg on", msg.Subject(), string(msg.Data()))
-	}, jetstream.ConsumeErrHandler(func(consumeCtx jetstream.ConsumeContext, err error) {
-		fmt.Println(err)
-	}))
-	if err != nil {
-		log.Fatal(err)
-	}
+	cc := BuildConsumer(stream, ConsumerConfig{
+		Handler: processTradeWithError(js, ctx),
+		HandlerErr: func(consumeCtx jetstream.ConsumeContext, err error) {
+			fmt.Println(err)
+		},
+	}, ctx)
 	defer cc.Drain()
 
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 	<-sig
+}
+
+func processTradeWithError(js jetstream.JetStream, ctx context.Context) func(msg jetstream.Msg) {
+	return func(msg jetstream.Msg) {
+		trade := string(msg.Data())
+		fmt.Println("Received Trade Order Error:", trade)
+
+		cn := strings.Split(trade, " ")[:1]
+		fixed := strings.Join(cn, ",")
+
+		notCanFix := len(strings.Split(fixed, ",")) != 4
+		if notCanFix {
+			fmt.Println("Trade Order Cannot Be Fixed:", fixed)
+		} else {
+			fmt.Println("Trade Fixed:", fixed)
+			fmt.Println("Resubmitting Trade For Re-Processing")
+
+			id := msg.Headers().Get("trade-id")
+			js.PublishMsg(ctx, &nats.Msg{
+				Subject: fmt.Sprintf("trade.%s", id),
+				Data:    []byte(fixed),
+				Header: nats.Header{
+					"trade-id": []string{id},
+				},
+			})
+		}
+
+		msg.Ack()
+	}
 }

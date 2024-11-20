@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -13,6 +14,8 @@ import (
 	"github.com/nats-io/nats.go"
 	"github.com/nats-io/nats.go/jetstream"
 )
+
+const MAX_RETRIES = 3
 
 func main() {
 	nc, err := nats.Connect("nats://127.0.0.1:4222")
@@ -58,19 +61,29 @@ func processTradeWithError(js jetstream.JetStream, ctx context.Context) func(msg
 		notCanFix := len(strings.Split(fixed, ",")) != 4
 		if notCanFix {
 			fmt.Println("Trade Order Cannot Be Fixed:", fixed)
-		} else {
-			fmt.Println("Trade Fixed:", fixed)
-			fmt.Println("Resubmitting Trade For Re-Processing")
-
-			id := msg.Headers().Get("trade-id")
-			js.PublishMsg(ctx, &nats.Msg{
-				Subject: fmt.Sprintf("trade.%s", id),
-				Data:    []byte(fixed),
-				Header: nats.Header{
-					"trade-id": []string{id},
-				},
-			})
+			msg.Ack()
+			return
 		}
+		id := msg.Headers().Get("trade-id")
+		tradeRetry, _ := strconv.Atoi(msg.Headers().Get("trade-retry"))
+
+		if tradeRetry >= MAX_RETRIES {
+			fmt.Println("Trade Order Cannot Be Fixed After", MAX_RETRIES, "Retries:", fixed)
+			msg.Ack()
+			return
+		}
+
+		fmt.Println("Trade Fixed:", fixed)
+		fmt.Println("Resubmitting Trade For Re-Processing")
+
+		js.PublishMsg(ctx, &nats.Msg{
+			Subject: fmt.Sprintf("trade.%s", id),
+			Data:    []byte(fixed),
+			Header: nats.Header{
+				"trade-id":    []string{id},
+				"trade-retry": []string{string(tradeRetry + 1)},
+			},
+		})
 
 		msg.Ack()
 	}

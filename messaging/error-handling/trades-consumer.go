@@ -54,6 +54,7 @@ func processTrade(js jetstream.JetStream, ctx context.Context) func(msg jetstrea
 
 		if invalidTrade {
 			tradeId := msg.Headers().Get("trade-id")
+			tradeRetry := msg.Headers().Get("trade-retry")
 
 			fmt.Println("Error placing trade", order)
 			fmt.Println("Sending to trade error processor  <-- delegate the error fixing and move on")
@@ -61,7 +62,8 @@ func processTrade(js jetstream.JetStream, ctx context.Context) func(msg jetstrea
 				Subject: fmt.Sprintf("%s.error", msg.Subject()),
 				Data:    msg.Data(),
 				Header: nats.Header{
-					"trade-id": []string{tradeId},
+					"trade-id":    []string{tradeId},
+					"trade-retry": []string{tradeRetry},
 				},
 			})
 		} else {

@@ -35,7 +35,7 @@ func main() {
 
 	for i := 0; i < 6; i++ {
 		js.PublishMsg(ctx, &nats.Msg{
-			Subject: fmt.Sprintf("trade.%s"),
+			Subject: fmt.Sprintf("trade.%s", i),
 			Data:    []byte(tradesOrder[i%len(tradesOrder)]),
 			Header: nats.Header{
 				"trade-id": []string{string(i)},

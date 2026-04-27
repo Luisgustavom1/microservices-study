@@ -1,14 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import {
-  CreateTransactionProps,
-  Transaction,
-} from '../../domain/entities/transaction';
+import { Transaction } from '../../domain/entities/transaction';
 import type { CreateTransactionIntentRequest } from '../dto/create-transaction-intent.request';
 import { TransactionRepository } from '../../persistence/transaction/transaction.repository';
 import { WalletRepository } from '../../../wallets/persistence/wallet.repository';
-
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 @Injectable()
 export class CreateTransactionIntentUseCase {
@@ -18,43 +12,38 @@ export class CreateTransactionIntentUseCase {
   ) {}
 
   async execute(request: CreateTransactionIntentRequest): Promise<Transaction> {
-    const originWalletId = this.normalizeUuid(
-      request.originWalletId,
-      'originWalletId',
-    );
-    const destinationWalletId = this.normalizeUuid(
-      request.destinationWalletId,
-      'destinationWalletId',
-    );
-
-    const originWalletBalance: string | null =
-      await this.walletRepository.getBalance(originWalletId);
-
-    if (!originWalletBalance) {
-      throw new BadRequestException('originWalletId wallet not found');
-    }
-
-    const transaction = this.buildTransaction({
-      originWalletId,
-      destinationWalletId,
-      amount: request.amount,
-      originWalletBalance,
-    });
-
-    return this.transactionRepository.createIntent(transaction);
-  }
-
-  private normalizeUuid(value: unknown, fieldName: string): string {
-    if (typeof value !== 'string' || !UUID_PATTERN.test(value)) {
-      throw new BadRequestException(`${fieldName} must be a valid UUID`);
-    }
-
-    return value;
-  }
-
-  private buildTransaction(input: CreateTransactionProps): Transaction {
     try {
-      return Transaction.create(input);
+      const originWalletId = request.originWalletId;
+      const destinationWalletId = request.destinationWalletId;
+
+      if (originWalletId === destinationWalletId) {
+        throw new BadRequestException(
+          'originWalletId and destinationWalletId must be different',
+        );
+      }
+
+      const [originWallet, destinationWallet] = await Promise.all([
+        this.walletRepository.getById(originWalletId),
+        this.walletRepository.getById(destinationWalletId),
+      ]);
+
+      if (!originWallet) {
+        throw new BadRequestException('originWalletId wallet not found');
+      }
+
+      if (!destinationWallet) {
+        throw new BadRequestException('destinationWalletId wallet not found');
+      }
+
+      const transaction = Transaction.create({
+        originWalletId,
+        destinationWalletId,
+        amount: request.amount,
+      });
+
+      transaction.validateBalance(originWallet.balance);
+
+      return this.transactionRepository.createIntent(transaction);
     } catch (error) {
       if (error instanceof Error) {
         throw new BadRequestException(error.message);

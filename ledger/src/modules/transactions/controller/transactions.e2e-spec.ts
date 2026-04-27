@@ -24,12 +24,14 @@ describe('TransactionsController (e2e)', () => {
     dataSource = app.get(DataSource);
 
     await dataSource.query(
-      'INSERT INTO wallets (id, email, balance) VALUES ($1, $2, 1000), ($3, $4, 0)',
+      'INSERT INTO wallets (id, email, balance) VALUES ($1, $2, $3), ($4, $5, $6)',
       [
         originWalletId,
-        'origin-wallet@test.local',
+        'origin@test.local',
+        '1000',
         destinationWalletId,
-        'destination-wallet@test.local',
+        'destination@test.local',
+        '0',
       ],
     );
   });
@@ -69,20 +71,6 @@ describe('TransactionsController (e2e)', () => {
     });
   });
 
-  it('rejects invalid payloads', async () => {
-    await request(app.getHttpServer())
-      .post('/transactions')
-      .send({
-        originWalletId: 'not-a-uuid',
-        destinationWalletId,
-        amount: '150.5',
-      })
-      .expect(400)
-      .expect(({ body }: { body: { message: string } }) => {
-        expect(body.message).toBe('originWalletId must be a valid UUID');
-      });
-  });
-
   it('rejects amount greater than origin wallet balance', async () => {
     await request(app.getHttpServer())
       .post('/transactions')
@@ -96,6 +84,38 @@ describe('TransactionsController (e2e)', () => {
         expect(body.message).toBe(
           'amount must be less than or equal to origin wallet balance',
         );
+      });
+  });
+
+  it('rejects if the origin wallet does not exist', async () => {
+    const nonExistentWalletId = '99999999-9999-4999-8999-999999999999';
+
+    await request(app.getHttpServer())
+      .post('/transactions')
+      .send({
+        originWalletId: nonExistentWalletId,
+        destinationWalletId,
+        amount: '1000.01',
+      })
+      .expect(400)
+      .expect(({ body }: { body: { message: string } }) => {
+        expect(body.message).toBe('originWalletId wallet not found');
+      });
+  });
+
+  it('rejects if the destination wallet does not exist', async () => {
+    const nonExistentWalletId = '99999999-9999-4999-8999-999999999999';
+
+    await request(app.getHttpServer())
+      .post('/transactions')
+      .send({
+        originWalletId,
+        destinationWalletId: nonExistentWalletId,
+        amount: '100',
+      })
+      .expect(400)
+      .expect(({ body }: { body: { message: string } }) => {
+        expect(body.message).toBe('destinationWalletId wallet not found');
       });
   });
 

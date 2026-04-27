@@ -6,7 +6,6 @@ export interface CreateTransactionProps {
   originWalletId: string;
   destinationWalletId: string;
   amount: string;
-  originWalletBalance?: string;
   status?: TransactionStatus;
   id?: string;
   createdAt?: Date;
@@ -27,8 +26,6 @@ export class Transaction {
     this.amount = this.normalizeAmount(props.amount);
     this.status = props.status ?? TransactionStatus.PENDING;
     this.createdAt = props.createdAt ?? new Date();
-
-    this.validateInvariants(props.originWalletBalance);
   }
 
   static create(props: CreateTransactionProps): Transaction {
@@ -49,10 +46,10 @@ export class Transaction {
     return amountValue.toFixed(2);
   }
 
-  private validateInvariants(walletBalance?: unknown): void {
-    if (this.originWalletId === this.destinationWalletId) {
+  validateBalance(walletBalance?: string): void {
+    if (!walletBalance) {
       throw new Error(
-        'originWalletId and destinationWalletId must be different',
+        'amount must be less than or equal to origin wallet balance',
       );
     }
 

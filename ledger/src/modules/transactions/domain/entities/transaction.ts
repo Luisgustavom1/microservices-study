@@ -1,3 +1,6 @@
+import { TransactionEvents } from '../events/events';
+import { TransactionStartedDomainEvent } from '../events/transaction-started.domain-event';
+
 export enum TransactionStatus {
   PENDING = 'PENDING',
 }
@@ -18,6 +21,7 @@ export class Transaction {
   declare amount: string;
   declare status: TransactionStatus;
   declare createdAt: Date;
+  private _domainEvents: TransactionStartedDomainEvent[] = [];
 
   private constructor(props: CreateTransactionProps) {
     this.id = props.id ?? '';
@@ -58,5 +62,32 @@ export class Transaction {
         'amount must be less than or equal to origin wallet balance',
       );
     }
+  }
+
+  start(walletBalance?: string): void {
+    this._domainEvents.push(this.toStartTransactionDomainEvent());
+
+    this.validateBalance(walletBalance);
+    this.status = TransactionStatus.PENDING;
+  }
+
+  private toStartTransactionDomainEvent(): TransactionStartedDomainEvent {
+    return {
+      eventName: 'transaction-started',
+      transactionId: this.id,
+      originWalletId: this.originWalletId,
+      destinationWalletId: this.destinationWalletId,
+      amount: this.amount,
+      status: this.status,
+      occurredAt: this.createdAt.toISOString(),
+    };
+  }
+
+  getDomainEvents(): TransactionEvents[] {
+    return this._domainEvents.map((event) => ({
+      ...event,
+      // TODO: return to this, setting id after creation is a bit hacky, we should find a better way to handle this
+      transactionId: this.id,
+    }));
   }
 }

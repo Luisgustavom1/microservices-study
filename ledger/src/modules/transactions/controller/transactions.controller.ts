@@ -1,18 +1,15 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import type { CreateTransactionIntentRequest } from '../application/dto/create-transaction-intent.request';
-import type { Transaction } from '../domain/entities/transaction';
-import { CreateTransactionIntentUseCase } from '../application/use-cases/create-transaction-intent.use-case';
+import type { StartTransactionRequest } from '../application/dto/start-transaction.request';
+import { StartTransactionUseCase } from '../application/use-cases/start-transaction.use-case';
 
 @Controller('transactions')
 export class TransactionsController {
   constructor(
-    private readonly createTransactionIntentUseCase: CreateTransactionIntentUseCase,
+    private readonly startTransactionUseCase: StartTransactionUseCase,
   ) {}
 
   @Post()
-  create(
-    @Body() request: CreateTransactionIntentRequest,
-  ): Promise<Transaction> {
-    return this.createTransactionIntentUseCase.execute(request);
+  create(@Body() request: StartTransactionRequest) {
+    return this.startTransactionUseCase.execute(request);
   }
 }

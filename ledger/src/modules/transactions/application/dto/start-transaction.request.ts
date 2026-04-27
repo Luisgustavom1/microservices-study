@@ -1,4 +1,4 @@
-export interface CreateTransactionIntentRequest {
+export interface StartTransactionRequest {
   originWalletId: string;
   destinationWalletId: string;
   amount: string;

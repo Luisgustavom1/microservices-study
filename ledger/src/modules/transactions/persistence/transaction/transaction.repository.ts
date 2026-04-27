@@ -1,10 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-  Transaction,
-  TransactionStatus,
-} from '../../domain/entities/transaction';
+import { Transaction } from '../../domain/entities/transaction';
 import { TypeOrmTransactionEntity } from './transaction.entity';
 
 @Injectable()
@@ -14,12 +11,12 @@ export class TransactionRepository {
     private readonly transactionRepository: Repository<TypeOrmTransactionEntity>,
   ) {}
 
-  async createIntent(input: Transaction): Promise<Transaction> {
+  async create(input: Transaction): Promise<Transaction> {
     const transaction = this.transactionRepository.create({
       originWalletId: input.originWalletId,
       destinationWalletId: input.destinationWalletId,
       amount: input.amount,
-      status: TransactionStatus.PENDING,
+      status: input.status,
     });
 
     const savedTransaction = await this.transactionRepository.save(transaction);

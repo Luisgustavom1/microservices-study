@@ -6,18 +6,32 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from '../../../app.module';
 import { Transaction, TransactionStatus } from '../domain/entities/transaction';
+import { TRANSACTION_STARTED_PUBLISHER } from '../domain/events/transaction-started.domain-event';
+import { TransactionEvents } from '../domain/events/events';
+import {
+  createTransactionStartedPublisherMock,
+  expectedTransactionStartedEvent,
+} from '../../../../test/mocks/transaction-started-publisher.mock';
 
 describe('TransactionsController (e2e)', () => {
   let app: INestApplication<App>;
   let dataSource: DataSource;
+  let publishMock: jest.Mock<Promise<void>, [TransactionEvents]>;
 
   const originWalletId = '11111111-1111-4111-8111-111111111111';
   const destinationWalletId = '22222222-2222-4222-8222-222222222222';
 
   beforeAll(async () => {
+    const transactionStartedPublisherMock =
+      createTransactionStartedPublisherMock();
+    publishMock = transactionStartedPublisherMock.publishMock;
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      .overrideProvider(TRANSACTION_STARTED_PUBLISHER)
+      .useValue(transactionStartedPublisherMock.publisher)
+      .compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
@@ -34,6 +48,10 @@ describe('TransactionsController (e2e)', () => {
         '0',
       ],
     );
+  });
+
+  beforeEach(() => {
+    publishMock.mockClear();
   });
 
   it('POST /transactions', async () => {
@@ -69,6 +87,16 @@ describe('TransactionsController (e2e)', () => {
       amount: '150.50',
       status: TransactionStatus.PENDING,
     });
+
+    expect(publishMock).toHaveBeenCalledTimes(1);
+    expect(publishMock).toHaveBeenCalledWith(
+      expectedTransactionStartedEvent({
+        originWalletId,
+        destinationWalletId,
+        amount: '150.50',
+        status: TransactionStatus.PENDING,
+      }),
+    );
   });
 
   it('rejects amount greater than origin wallet balance', async () => {
@@ -85,6 +113,8 @@ describe('TransactionsController (e2e)', () => {
           'amount must be less than or equal to origin wallet balance',
         );
       });
+
+    expect(publishMock).not.toHaveBeenCalled();
   });
 
   it('rejects if the origin wallet does not exist', async () => {

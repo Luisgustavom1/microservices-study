@@ -1,18 +1,21 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import type { Transaction } from '../../domain/entities/transaction';
 import {
-  Transaction as TransactionEntity,
-  TransactionStatus,
+  CreateTransactionProps,
+  Transaction,
 } from '../../domain/entities/transaction';
 import type { CreateTransactionIntentRequest } from '../dto/create-transaction-intent.request';
 import { TransactionRepository } from '../../persistence/transaction/transaction.repository';
+import { WalletRepository } from '../../../wallets/persistence/wallet.repository';
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 @Injectable()
 export class CreateTransactionIntentUseCase {
-  constructor(private readonly transactionRepository: TransactionRepository) {}
+  constructor(
+    private readonly transactionRepository: TransactionRepository,
+    private readonly walletRepository: WalletRepository,
+  ) {}
 
   async execute(request: CreateTransactionIntentRequest): Promise<Transaction> {
     const originWalletId = this.normalizeUuid(
@@ -23,20 +26,22 @@ export class CreateTransactionIntentUseCase {
       request.destinationWalletId,
       'destinationWalletId',
     );
-    const amount = this.normalizeAmount(request.amount);
 
-    if (originWalletId === destinationWalletId) {
-      throw new BadRequestException(
-        'originWalletId and destinationWalletId must be different',
-      );
+    const originWalletBalance: string | null =
+      await this.walletRepository.getBalance(originWalletId);
+
+    if (!originWalletBalance) {
+      throw new BadRequestException('originWalletId wallet not found');
     }
 
-    return this.transactionRepository.createIntent({
+    const transaction = this.buildTransaction({
       originWalletId,
       destinationWalletId,
-      amount,
-      status: TransactionStatus.PENDING,
+      amount: request.amount,
+      originWalletBalance,
     });
+
+    return this.transactionRepository.createIntent(transaction);
   }
 
   private normalizeUuid(value: unknown, fieldName: string): string {
@@ -47,11 +52,15 @@ export class CreateTransactionIntentUseCase {
     return value;
   }
 
-  private normalizeAmount(value: unknown): string {
+  private buildTransaction(input: CreateTransactionProps): Transaction {
     try {
-      return TransactionEntity.normalizeAmount(value);
-    } catch {
-      throw new BadRequestException('amount must be a positive number');
+      return Transaction.create(input);
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new BadRequestException(error.message);
+      }
+
+      throw new BadRequestException('Invalid transaction data');
     }
   }
 }

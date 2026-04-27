@@ -24,7 +24,7 @@ describe('TransactionsController (e2e)', () => {
     dataSource = app.get(DataSource);
 
     await dataSource.query(
-      'INSERT INTO wallets (id, email, balance) VALUES ($1, $2, 0), ($3, $4, 0)',
+      'INSERT INTO wallets (id, email, balance) VALUES ($1, $2, 1000), ($3, $4, 0)',
       [
         originWalletId,
         'origin-wallet@test.local',
@@ -80,6 +80,22 @@ describe('TransactionsController (e2e)', () => {
       .expect(400)
       .expect(({ body }: { body: { message: string } }) => {
         expect(body.message).toBe('originWalletId must be a valid UUID');
+      });
+  });
+
+  it('rejects amount greater than origin wallet balance', async () => {
+    await request(app.getHttpServer())
+      .post('/transactions')
+      .send({
+        originWalletId,
+        destinationWalletId,
+        amount: '1000.01',
+      })
+      .expect(400)
+      .expect(({ body }: { body: { message: string } }) => {
+        expect(body.message).toBe(
+          'amount must be less than or equal to origin wallet balance',
+        );
       });
   });
 

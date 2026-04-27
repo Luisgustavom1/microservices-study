@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/google/uuid"
@@ -29,17 +31,31 @@ func main() {
 		go func(id int) {
 			defer wg.Done()
 			for job := range jobChan {
+				fmt.Println("Worker", id, "processing job", job)
 				sendRequest(nc, job)
 			}
 		}(w)
 	}
 
 	for i := 1; i <= 5; i++ {
-		jobChan <- i
-	}
-	close(jobChan)
 
-	wg.Wait()
+	}
+
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
+
+	i := 1
+	for {
+		switch <-sig {
+		case syscall.SIGINT:
+			fmt.Println("SIGINT received")
+			jobChan <- i
+			i++
+		case syscall.SIGTERM:
+			close(jobChan)
+			os.Exit(0)
+		}
+	}
 }
 
 func sendRequest(nc *nats.Conn, i int) {

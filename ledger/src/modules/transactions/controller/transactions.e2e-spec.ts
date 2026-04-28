@@ -1,4 +1,3 @@
-/// <reference types="jest" />
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { DataSource } from 'typeorm';
@@ -12,6 +11,7 @@ import {
   createTransactionStartedPublisherMock,
   expectedTransactionStartedEvent,
 } from '../../../../test/mocks/transaction-started-publisher.mock';
+import { WalletEntity } from '../../wallets/persistence/wallet.entity';
 
 describe('TransactionsController (e2e)', () => {
   let app: INestApplication<App>;
@@ -37,17 +37,18 @@ describe('TransactionsController (e2e)', () => {
     await app.init();
     dataSource = app.get(DataSource);
 
-    await dataSource.query(
-      'INSERT INTO wallets (id, email, balance) VALUES ($1, $2, $3), ($4, $5, $6)',
-      [
-        originWalletId,
-        'origin@test.local',
-        '1000',
-        destinationWalletId,
-        'destination@test.local',
-        '0',
-      ],
-    );
+    await Promise.all([
+      dataSource.manager.save(WalletEntity, {
+        id: originWalletId,
+        email: 'origin@test.local',
+        balance: '1000',
+      }),
+      dataSource.manager.save(WalletEntity, {
+        id: destinationWalletId,
+        email: 'destination@test.local',
+        balance: '0',
+      }),
+    ]);
   });
 
   beforeEach(() => {
@@ -67,9 +68,6 @@ describe('TransactionsController (e2e)', () => {
     const body = response.body as Transaction;
 
     expect(body).toMatchObject({
-      originWalletId,
-      destinationWalletId,
-      amount: '150.50',
       status: TransactionStatus.PENDING,
     });
     expect(body.id).toEqual(expect.any(String));

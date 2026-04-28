@@ -60,6 +60,7 @@ export class StartTransactionUseCase {
       return {
         id: createdTransaction.id,
         status: createdTransaction.status,
+        createdAt: createdTransaction.createdAt,
       };
     } catch (error) {
       if (error instanceof Error) {

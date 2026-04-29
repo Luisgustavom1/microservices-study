@@ -28,4 +28,11 @@ export class TypeOrmTransactionEntity {
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
   declare createdAt: Date;
+
+  @Column({
+    name: 'idempotency_key',
+    type: 'varchar',
+    length: 255,
+  })
+  declare idempotencyKey: string;
 }

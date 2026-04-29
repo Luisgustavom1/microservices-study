@@ -12,6 +12,7 @@ import {
   expectedTransactionStartedEvent,
 } from '../../../../test/mocks/transaction-started-publisher.mock';
 import { WalletEntity } from '../../wallets/persistence/wallet.entity';
+import { TypeOrmTransactionEntity } from '../../transactions/persistence/transaction/transaction.entity';
 
 describe('TransactionsController (e2e)', () => {
   let app: INestApplication<App>;
@@ -20,6 +21,7 @@ describe('TransactionsController (e2e)', () => {
 
   const originWalletId = '11111111-1111-4111-8111-111111111111';
   const destinationWalletId = '22222222-2222-4222-8222-222222222222';
+  const baseIdempotencyKey = '550e8400-e29b-41d4-a716-446655440000';
 
   beforeAll(async () => {
     const transactionStartedPublisherMock =
@@ -62,6 +64,7 @@ describe('TransactionsController (e2e)', () => {
         originWalletId,
         destinationWalletId,
         amount: '150.5',
+        idempotencyKey: `${baseIdempotencyKey}-success`,
       })
       .expect(201);
 
@@ -104,6 +107,7 @@ describe('TransactionsController (e2e)', () => {
         originWalletId,
         destinationWalletId,
         amount: '1000.01',
+        idempotencyKey: `${baseIdempotencyKey}-insufficient-balance`,
       })
       .expect(400)
       .expect(({ body }: { body: { message: string } }) => {
@@ -124,6 +128,7 @@ describe('TransactionsController (e2e)', () => {
         originWalletId: nonExistentWalletId,
         destinationWalletId,
         amount: '1000.01',
+        idempotencyKey: `${baseIdempotencyKey}-missing-origin`,
       })
       .expect(400)
       .expect(({ body }: { body: { message: string } }) => {
@@ -140,11 +145,67 @@ describe('TransactionsController (e2e)', () => {
         originWalletId,
         destinationWalletId: nonExistentWalletId,
         amount: '100',
+        idempotencyKey: `${baseIdempotencyKey}-missing-destination`,
       })
       .expect(400)
       .expect(({ body }: { body: { message: string } }) => {
         expect(body.message).toBe('destinationWalletId wallet not found');
       });
+  });
+
+  it('returns cached transaction on duplicate idempotency key', async () => {
+    const idempotencyKey = `${baseIdempotencyKey}-duplicate-cache`;
+
+    const firstResponse = await request(app.getHttpServer())
+      .post('/transactions')
+      .send({
+        originWalletId,
+        destinationWalletId,
+        amount: '100',
+        idempotencyKey,
+      })
+      .expect(201);
+
+    const firstTransactionId = (firstResponse.body as { id: string }).id;
+    expect(publishMock).toHaveBeenCalledTimes(1);
+    publishMock.mockClear();
+
+    const secondResponse = await request(app.getHttpServer())
+      .post('/transactions')
+      .send({
+        originWalletId,
+        destinationWalletId,
+        amount: '100',
+        idempotencyKey,
+      })
+      .expect(201);
+
+    const secondTransactionId = (secondResponse.body as { id: string }).id;
+
+    expect(secondTransactionId).toBe(firstTransactionId);
+    expect(publishMock).not.toHaveBeenCalled();
+
+    const savedTransactions: Array<{ id: string }> = await dataSource
+      .getRepository(TypeOrmTransactionEntity)
+      .find({
+        where: {
+          idempotencyKey,
+        },
+      });
+    expect(savedTransactions).toHaveLength(1);
+    expect(savedTransactions[0].id).toBe(firstTransactionId);
+  });
+
+  it('rejects request without idempotency key', async () => {
+    await request(app.getHttpServer())
+      .post('/transactions')
+      .send({
+        originWalletId,
+        destinationWalletId,
+        amount: '100',
+        // idempotencyKey intentionally omitted
+      })
+      .expect(400);
   });
 
   afterAll(async () => {

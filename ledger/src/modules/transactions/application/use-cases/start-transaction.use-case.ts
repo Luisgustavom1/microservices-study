@@ -17,6 +17,23 @@ export class StartTransactionUseCase {
 
   async execute(request: StartTransactionRequest) {
     try {
+      if (!request.idempotencyKey) {
+        throw new BadRequestException('idempotencyKey is required');
+      }
+
+      const existingTransaction =
+        await this.transactionRepository.findByIdempotencyKey(
+          request.idempotencyKey,
+        );
+
+      if (existingTransaction) {
+        return {
+          id: existingTransaction.id,
+          status: existingTransaction.status,
+          createdAt: existingTransaction.createdAt,
+        };
+      }
+
       const originWalletId = request.originWalletId;
       const destinationWalletId = request.destinationWalletId;
 
@@ -43,6 +60,7 @@ export class StartTransactionUseCase {
         originWalletId,
         destinationWalletId,
         amount: request.amount,
+        idempotencyKey: request.idempotencyKey,
       });
 
       transaction.start(originWallet.balance);

@@ -12,6 +12,7 @@ export interface CreateTransactionProps {
   status?: TransactionStatus;
   id?: string;
   createdAt?: Date;
+  idempotencyKey: string;
 }
 
 export class Transaction {
@@ -21,6 +22,7 @@ export class Transaction {
   declare amount: string;
   declare status: TransactionStatus;
   declare createdAt: Date;
+  declare idempotencyKey: string;
   private _domainEvents: TransactionStartedDomainEvent[] = [];
 
   private constructor(props: CreateTransactionProps) {
@@ -30,6 +32,7 @@ export class Transaction {
     this.amount = this.normalizeAmount(props.amount);
     this.status = props.status ?? TransactionStatus.PENDING;
     this.createdAt = props.createdAt ?? new Date();
+    this.idempotencyKey = props.idempotencyKey;
   }
 
   static create(props: CreateTransactionProps): Transaction {

@@ -17,6 +17,7 @@ export class TransactionRepository {
       destinationWalletId: input.destinationWalletId,
       amount: input.amount,
       status: input.status,
+      idempotencyKey: input.idempotencyKey,
     });
 
     const savedTransaction = await this.transactionRepository.save(transaction);
@@ -28,6 +29,29 @@ export class TransactionRepository {
       amount: savedTransaction.amount,
       status: savedTransaction.status,
       createdAt: savedTransaction.createdAt,
+      idempotencyKey: savedTransaction.idempotencyKey,
+    });
+  }
+
+  async findByIdempotencyKey(
+    idempotencyKey: string,
+  ): Promise<Transaction | null> {
+    const entity = await this.transactionRepository.findOne({
+      where: { idempotencyKey },
+    });
+
+    if (!entity) {
+      return null;
+    }
+
+    return Transaction.create({
+      id: entity.id,
+      originWalletId: entity.originWalletId,
+      destinationWalletId: entity.destinationWalletId,
+      amount: entity.amount,
+      status: entity.status,
+      createdAt: entity.createdAt,
+      idempotencyKey: entity.idempotencyKey,
     });
   }
 }

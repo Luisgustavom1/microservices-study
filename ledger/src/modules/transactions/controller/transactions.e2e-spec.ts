@@ -11,8 +11,9 @@ import {
   createTransactionStartedPublisherMock,
   expectedTransactionStartedEvent,
 } from '../../../../test/mocks/transaction-started-publisher.mock';
-import { WalletEntity } from '../../wallets/persistence/wallet.entity';
-import { TypeOrmTransactionEntity } from '../../transactions/persistence/transaction/transaction.entity';
+import { TypeOrmTransactionEntity } from '../infrastructure/transaction/transaction.entity';
+import { LedgerWalletReader } from '../infrastructure/wallets/ledger-wallet.reader';
+import { createWalletReaderMock } from '../../../../test/mocks/wallet-reader.mock';
 
 describe('TransactionsController (e2e)', () => {
   let app: INestApplication<App>;
@@ -27,30 +28,60 @@ describe('TransactionsController (e2e)', () => {
     const transactionStartedPublisherMock =
       createTransactionStartedPublisherMock();
     publishMock = transactionStartedPublisherMock.publishMock;
+    const walletReaderMock = createWalletReaderMock();
+    walletReaderMock.getByIdMock.mockImplementation((walletId) => {
+      if (walletId === originWalletId) {
+        return Promise.resolve({
+          id: originWalletId,
+          email: 'origin@test.local',
+          balance: '1000',
+        });
+      }
+
+      if (walletId === destinationWalletId) {
+        return Promise.resolve({
+          id: destinationWalletId,
+          email: 'destination@test.local',
+          balance: '0',
+        });
+      }
+
+      return Promise.resolve(null);
+    });
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     })
       .overrideProvider(TRANSACTION_STARTED_PUBLISHER)
       .useValue(transactionStartedPublisherMock.publisher)
+      .overrideProvider(LedgerWalletReader)
+      .useValue(walletReaderMock)
       .compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
     dataSource = app.get(DataSource);
 
-    await Promise.all([
-      dataSource.manager.save(WalletEntity, {
-        id: originWalletId,
-        email: 'origin@test.local',
-        balance: '1000',
-      }),
-      dataSource.manager.save(WalletEntity, {
-        id: destinationWalletId,
-        email: 'destination@test.local',
-        balance: '0',
-      }),
-    ]);
+    await dataSource.query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"');
+    await dataSource.query('CREATE SCHEMA IF NOT EXISTS "transactions"');
+    await dataSource.query(
+      'DROP TABLE IF EXISTS "transactions"."transactions"',
+    );
+    await dataSource.query(`
+      CREATE TABLE "transactions"."transactions" (
+        "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+        "origin_wallet_id" uuid NOT NULL,
+        "destination_wallet_id" uuid NOT NULL,
+        "amount" numeric(18,2) NOT NULL,
+        "status" character varying NOT NULL DEFAULT 'PENDING',
+        "created_at" TIMESTAMP NOT NULL DEFAULT now(),
+        "idempotency_key" character varying(255) NOT NULL,
+        CONSTRAINT "PK_transactions_id" PRIMARY KEY ("id")
+      )
+    `);
+    await dataSource.query(
+      'CREATE UNIQUE INDEX "IDX_transactions_idempotency_key" ON "transactions"."transactions" ("idempotency_key")',
+    );
   });
 
   beforeEach(() => {
@@ -77,7 +108,7 @@ describe('TransactionsController (e2e)', () => {
     expect(body.createdAt).toEqual(expect.any(String));
 
     const savedTransactions: Array<Transaction> = await dataSource.query(
-      'SELECT * FROM transactions WHERE origin_wallet_id = $1 AND destination_wallet_id = $2',
+      'SELECT * FROM transactions.transactions WHERE origin_wallet_id = $1 AND destination_wallet_id = $2',
       [originWalletId, destinationWalletId],
     );
 
@@ -209,8 +240,7 @@ describe('TransactionsController (e2e)', () => {
   });
 
   afterAll(async () => {
-    await dataSource.query('DELETE FROM transactions');
-    await dataSource.query('DELETE FROM wallets');
+    await dataSource.query('DELETE FROM transactions.transactions');
     await app.close();
   });
 });

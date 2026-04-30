@@ -6,7 +6,7 @@ import {
 } from 'typeorm';
 import { TransactionStatus } from '../../domain/entities/transaction';
 
-@Entity({ name: 'transactions' })
+@Entity({ schema: 'transactions', name: 'transactions' })
 export class TypeOrmTransactionEntity {
   @PrimaryGeneratedColumn('uuid')
   declare id: string;

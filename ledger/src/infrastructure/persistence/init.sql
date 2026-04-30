@@ -1,1 +1,2 @@
 CREATE DATABASE payments;
+CREATE SCHEMA IF NOT EXISTS "public";

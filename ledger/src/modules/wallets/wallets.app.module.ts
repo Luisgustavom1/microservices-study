@@ -1,13 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TransactionsModule } from './modules/transactions/transactions.module';
+import { WalletsModule } from './wallets.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
@@ -17,12 +15,12 @@ import { TransactionsModule } from './modules/transactions/transactions.module';
         username: configService.get<string>('DB_USER', 'postgres'),
         password: configService.get<string>('DB_PASSWORD', 'postgres'),
         database: configService.get<string>('DB_NAME', 'payments'),
-        schema: configService.get<string>('DB_SCHEMA', 'transactions'),
+        schema: configService.get<string>('DB_SCHEMA', 'wallets'),
         autoLoadEntities: true,
         synchronize: false,
       }),
     }),
-    TransactionsModule,
+    WalletsModule,
   ],
 })
-export class AppModule {}
+export class WalletsAppModule {}

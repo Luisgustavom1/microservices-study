@@ -5,12 +5,12 @@ export class TransactionidempotencyKey1777376519079 implements MigrationInterfac
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
-      ALTER TABLE "transactions"
+      ALTER TABLE "transactions"."transactions"
       ADD COLUMN "idempotency_key" character varying(255) not null
     `);
 
     await queryRunner.query(`
-      CREATE UNIQUE INDEX "IDX_transactions_idempotency_key" ON "transactions" ("idempotency_key")
+      CREATE UNIQUE INDEX "IDX_transactions_idempotency_key" ON "transactions"."transactions" ("idempotency_key")
     `);
   }
 
@@ -20,7 +20,7 @@ export class TransactionidempotencyKey1777376519079 implements MigrationInterfac
     `);
 
     await queryRunner.query(`
-      ALTER TABLE "transactions"
+      ALTER TABLE "transactions"."transactions"
       DROP COLUMN "idempotency_key"
     `);
   }

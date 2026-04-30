@@ -5,8 +5,9 @@ export class CreateWalletsTable1777234553790 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"');
+    await queryRunner.query('CREATE SCHEMA IF NOT EXISTS "wallets"');
     await queryRunner.query(`
-      CREATE TABLE "wallets" (
+      CREATE TABLE "wallets"."wallets" (
         "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
         "email" character varying NOT NULL,
         "balance" numeric(18,2) NOT NULL DEFAULT 0,
@@ -17,6 +18,6 @@ export class CreateWalletsTable1777234553790 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query('DROP TABLE "wallets"');
+    await queryRunner.query('DROP TABLE "wallets"."wallets"');
   }
 }

@@ -8,6 +8,7 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USER ?? 'postgres',
   password: process.env.DB_PASSWORD ?? 'postgres',
   database: process.env.DB_NAME ?? 'payments',
+  schema: 'public',
   entities: [],
   migrations: ['src/infrastructure/persistence/migrations/*.ts'],
   synchronize: false,

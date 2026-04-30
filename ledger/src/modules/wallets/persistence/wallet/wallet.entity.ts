@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-@Entity({ name: 'wallets' })
+@Entity({ schema: 'wallets', name: 'wallets' })
 export class WalletEntity {
   @PrimaryColumn('uuid')
   declare id: string;

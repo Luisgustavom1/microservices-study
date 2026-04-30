@@ -8,4 +8,6 @@ export interface TransactionStartedDomainEvent {
   occurredAt: string;
 }
 
-export const TRANSACTION_STARTED_PUBLISHER = 'TRANSACTION_STARTED_PUBLISHER';
+export const TRANSACTION_STARTED_PUBLISHER = Symbol(
+  'TRANSACTION_STARTED_PUBLISHER',
+);

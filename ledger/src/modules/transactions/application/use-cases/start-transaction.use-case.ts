@@ -1,16 +1,16 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { Transaction } from '../../domain/entities/transaction';
 import type { StartTransactionRequest } from '../dto/start-transaction.request';
-import { TransactionRepository } from '../../persistence/transaction/transaction.repository';
-import { WalletRepository } from '../../../wallets/persistence/wallet.repository';
+import { TransactionRepository } from '../../infrastructure/transaction/transaction.repository';
 import { type TransactionStartedPublisher } from '../ports/transaction-started.publisher';
 import { TRANSACTION_STARTED_PUBLISHER } from '../../domain/events/transaction-started.domain-event';
+import { LedgerWalletReader } from '../../infrastructure/wallets/ledger-wallet.reader';
 
 @Injectable()
 export class StartTransactionUseCase {
   constructor(
     private readonly transactionRepository: TransactionRepository,
-    private readonly walletRepository: WalletRepository,
+    private readonly walletReader: LedgerWalletReader,
     @Inject(TRANSACTION_STARTED_PUBLISHER)
     private readonly transactionStartedPublisher: TransactionStartedPublisher,
   ) {}
@@ -44,8 +44,8 @@ export class StartTransactionUseCase {
       }
 
       const [originWallet, destinationWallet] = await Promise.all([
-        this.walletRepository.getById(originWalletId),
-        this.walletRepository.getById(destinationWalletId),
+        this.walletReader.getById(originWalletId),
+        this.walletReader.getById(destinationWalletId),
       ]);
 
       if (!originWallet) {

@@ -1,5 +1,5 @@
 import { db } from "../db";
-import { sqsClient, QUEUE_URL } from "../aws/sqs";
+import { sqsClient, AGENTIC_GATEWAY_QUEUE_URL } from "../aws/sqs";
 import { SendMessageCommand } from "@aws-sdk/client-sqs";
 
 export async function processOutbox() {
@@ -17,7 +17,7 @@ export async function processOutbox() {
       const events = result.rows;
 
       if (events.length === 0) {
-        return; // Nada para processar
+        return;
       }
 
       console.log(`[Outbox Relay] Encontrou ${events.length} eventos para enviar.`);
@@ -25,11 +25,12 @@ export async function processOutbox() {
       const publishedIds: string[] = [];
       for (const event of events) {
         try {
+          // TODO: make a strategy to send the message to the correct queue based on the event type
           await sqsClient.send(
             new SendMessageCommand({
-              QueueUrl: QUEUE_URL,
+              QueueUrl: AGENTIC_GATEWAY_QUEUE_URL,
               MessageBody: JSON.stringify(event.payload),
-              // todo: passar a enviar MessageGroupId: "group-1",
+              // TODO: passar a enviar MessageGroupId: "group-1",
             })
           );
           publishedIds.push(event.id);
@@ -38,7 +39,6 @@ export async function processOutbox() {
         }
       }
 
-      // Atualiza o status no banco apenas para os que foram enviados com sucesso
       if (publishedIds.length > 0) {
         await trx("outbox_events")
           .whereIn("id", publishedIds)
@@ -54,7 +54,6 @@ export async function processOutbox() {
   }
 }
 
-// Inicia o loop de pooling
 export function startOutboxRelay(intervalMs = 2000) {
   console.log(`🚀 Outbox Relay iniciado. Pooling a cada ${intervalMs}ms...`);
   setInterval(processOutbox, intervalMs);

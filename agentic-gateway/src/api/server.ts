@@ -5,7 +5,6 @@ import { db } from "../db";
 const app = express();
 app.use(express.json());
 
-// Validação do payload simulando o formato do WhatsApp/ChatWoot
 const WebhookSchema = z.object({
   message_id: z.string(),
   from: z.string(),
@@ -23,8 +22,6 @@ app.post("/webhook/whatsapp", async (req, res) => {
 
   // TODO: add idempotency check before insert
   try {
-    // Transação Atômica: Salva a mensagem E o evento do outbox.
-    // Se o banco cair no meio, desfaz tudo. O webhook retorna 500 e o WhatsApp faz retry.
     await db.transaction(async (trx) => {
       const [message] = await trx("messages")
         .insert({
@@ -48,8 +45,6 @@ app.post("/webhook/whatsapp", async (req, res) => {
     return res.status(200).send("OK");
 
   } catch (error: any) {
-    // 23505 é o código de erro do Postgres para violação de constraint (Unique)
-    // Isso garante a idempotência: se o WhatsApp mandar de novo, aceitamos silenciosamente.
     if (error.code === "23505") {
       console.log(`[API] Mensagem duplicada ignorada (Idempotência): ${message_id}`);
       return res.status(200).send("OK");

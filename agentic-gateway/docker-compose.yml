@@ -1,0 +1,65 @@
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: agentic_gateway
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d agentic_gateway"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  localstack:
+    image: localstack/localstack:3.6
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=sqs
+      - DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+    volumes:
+      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./localstack-init.sh:/etc/localstack/init/ready.d/init.sh
+
+  api:
+    build: .
+    command: npm run dev:api
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgres://user:password@db:5432/agentic_gateway
+      - AWS_ENDPOINT=http://localstack:4566
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+      localstack:
+        condition: service_started
+
+  consumer:
+    build: .
+    command: npm run dev:consumer
+    environment:
+      - DATABASE_URL=postgres://user:password@db:5432/agentic_gateway
+      - AWS_ENDPOINT=http://localstack:4566
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+      localstack:
+        condition: service_started
+
+volumes:
+  pgdata:

@@ -21,6 +21,7 @@ app.post("/webhook/whatsapp", async (req, res) => {
 
   const { message_id, from, body } = result.data;
 
+  // TODO: add idempotency check before insert
   try {
     // Transação Atômica: Salva a mensagem E o evento do outbox.
     // Se o banco cair no meio, desfaz tudo. O webhook retorna 500 e o WhatsApp faz retry.

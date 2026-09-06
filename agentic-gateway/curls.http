@@ -1,0 +1,3 @@
+curl -X POST http://localhost:3000/webhook/whatsapp \
+-H "Content-Type: application/json" \
+-d '{"message_id": "msg_004", "from": "5511999999999", "body": "Preciso da segunda via da minha nota fiscal"}'

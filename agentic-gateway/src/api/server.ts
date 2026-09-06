@@ -22,7 +22,16 @@ app.post("/webhook/whatsapp", async (req, res) => {
 
   // TODO: add idempotency check before insert
   try {
-    await db.transaction(async (trx) => {
+    const { message, isDuplicate } = await db.transaction(async (trx) => {
+      const existingMessage = await trx("messages")
+        .where({ external_id: message_id })
+        .first();
+
+      if (existingMessage) {
+        console.log(`[API] Mensagem duplicada ignorada (Idempotência): ${message_id}`);
+        return { message: existingMessage, isDuplicate: true };
+      }
+
       const [message] = await trx("messages")
         .insert({
           external_id: message_id,
@@ -39,17 +48,18 @@ app.post("/webhook/whatsapp", async (req, res) => {
         payload: JSON.stringify(message),
         status: "PENDING",
       });
+
+      return { message, isDuplicate: false };
     });
 
-    console.log(`[API] Mensagem recebida com sucesso: ${message_id}`);
-    return res.status(200).send("OK");
-
-  } catch (error: any) {
-    if (error.code === "23505") {
-      console.log(`[API] Mensagem duplicada ignorada (Idempotência): ${message_id}`);
+    if (isDuplicate) {
+      console.log(`[API] Mensagem duplicada recebida: ${message_id}`);
       return res.status(200).send("OK");
     }
 
+    console.log(`[API] Mensagem recebida com sucesso: ${message_id}`);
+    return res.status(200).send("OK");
+  } catch (error: any) {
     console.error(`[API] Erro ao processar webhook:`, error);
     return res.status(500).send("Internal Server Error");
   }

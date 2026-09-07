@@ -16,7 +16,7 @@ export async function processSQSQueue() {
     );
 
     if (!Messages || Messages.length === 0) {
-      console.log(`[SQS Consumer] Nenhuma mensagem encontrada na fila.`);
+      console.log(`[AI Consumer] Nenhuma mensagem encontrada na fila.`);
       return;
     }
 
@@ -24,16 +24,24 @@ export async function processSQSQueue() {
       if (!msg.Body) continue;
 
       const payload = JSON.parse(msg.Body);
-      console.log(`[SQS Consumer] Mensagem lida da fila. ID do Banco: ${payload.id}`);
+      console.log(`[AI Consumer] Mensagem lida da fila. ID do Banco: ${payload.id}`);
 
-      await db("messages").where("id", payload.id).update({ status: "PROCESSING" });
+      const resultAffected = await db("messages").where({
+        id: payload.id,
+        status: "RECEIVED",
+      }).update({ status: "PROCESSING" });
+
+      if (resultAffected === 0) {
+        console.log(`[AI Consumer] Mensagem ${payload.id} já está sendo processada ou não está no status RECEIVED. Ignorando.`);
+        continue;
+      }
 
       const agentResult = await agent.processMessage(payload.external_id, payload.customer_identifier, payload.content);
-
       // TODO: dispatch webhook to chatwoot
+
       await db("messages").where("id", payload.id).update({ status: agentResult.status });
 
-      console.log(`[SQS Consumer] Fluxo finalizado: ${agentResult.status}. Resposta: ${agentResult.replyMessage}`);
+      console.log(`[AI Consumer] Fluxo finalizado: ${agentResult.status}. Resposta: ${agentResult.replyMessage}`);
 
       await sqsClient.send(
         new DeleteMessageCommand({
@@ -41,18 +49,14 @@ export async function processSQSQueue() {
           ReceiptHandle: msg.ReceiptHandle,
         })
       );
-      console.log(`[SQS Consumer] Mensagem removida da fila do SQS.`);
+      console.log(`[AI Consumer] Mensagem removida da fila do SQS.`);
     }
   } catch (error) {
-    console.error("[SQS Consumer] Erro ao consumir fila retry:", error);
+    console.error("[AI Consumer] Erro ao consumir fila retry:", error);
   }
 }
 
-export function startSQSConsumer() {
-  console.log(`🚀 SQS Consumer iniciado. Escutando a fila...`);
-  const loop = async () => {
-    await processSQSQueue();
-    setImmediate(loop);
-  };
-  loop();
+export function startSQSConsumer(intervalMs = 2000) {
+  console.log(`🚀 AI Consumer iniciado. Escutando a fila...`);
+  setInterval(processSQSQueue, intervalMs);
 }

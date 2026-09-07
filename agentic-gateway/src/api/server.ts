@@ -22,13 +22,12 @@ app.post("/webhook/whatsapp", async (req, res) => {
 
   // TODO: add idempotency check before insert
   try {
-    const { message, isDuplicate } = await db.transaction(async (trx) => {
+    const { isDuplicate } = await db.transaction(async (trx) => {
       const existingMessage = await trx("messages")
         .where({ external_id: message_id })
         .first();
 
       if (existingMessage) {
-        console.log(`[API] Mensagem duplicada ignorada (Idempotência): ${message_id}`);
         return { message: existingMessage, isDuplicate: true };
       }
 
